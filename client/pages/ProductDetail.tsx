@@ -44,7 +44,6 @@ export default function ProductDetail() {
       setLoading(true);
       
       try {
-        // Load product from API
         const found = await api.products.getBySlug(slug!);
         
         if (found) {
