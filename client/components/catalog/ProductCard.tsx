@@ -14,9 +14,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
     : 0;
 
   return (
-    <Link to={`/products/${product.slug}`}>
+    <Link to={`/products/${product.slug}`} className="block h-full">
       <motion.div
-        className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100"
+        className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col h-full"
         whileHover={{ y: -8, scale: 1.02 }}
         transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
         initial={{ opacity: 0, y: 20 }}
@@ -24,7 +24,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         whileTap={{ scale: 0.98 }}
       >
         {/* Image Container */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 h-56">
+        <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 aspect-square w-full">
           <img
             src={product.images[0] || "/placeholder.svg"}
             alt={product.title}
