@@ -31,7 +31,7 @@ export const translations = {
     
     // Home page
     newArrivals: "Yangi Kelganlar",
-    mostPopular: "Eng mashhoqlar",
+    mostPopular: "Eng mashhurlar",
     trustBadge: "Ishonch belgisi",
     cotton: "100% Paxta",
     natural: "Sof va tabiiy",
