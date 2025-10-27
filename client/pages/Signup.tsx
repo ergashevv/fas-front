@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Heart, Star, Sparkles, Gift } from "lucide-react";
+import { Eye, EyeOff, Heart, Star, Sparkles, Gift, AlertCircle } from "lucide-react";
 import { useTranslation } from "@/lib/useTranslation";
+import { useAuth } from "@/store/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -18,9 +20,10 @@ export default function Signup() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { signup, isLoading, error, clearError } = useAuth();
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -31,13 +34,32 @@ export default function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    clearError();
     
-    // Simulate signup
-    setTimeout(() => {
-      setIsLoading(false);
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: t("error"),
+        description: "Parollar mos kelmaydi",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await signup(formData.name, formData.email, formData.phone, formData.password);
+      toast({
+        title: t("success"),
+        description: "Ro'yxatdan o'tish muvaffaqiyatli",
+      });
       navigate("/profile");
-    }, 2000);
+    } catch (error: any) {
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -128,6 +150,17 @@ export default function Signup() {
               onSubmit={handleSubmit}
               className="space-y-4"
             >
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">
                   {t("signup.name")}

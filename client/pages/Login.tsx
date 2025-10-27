@@ -1,30 +1,45 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Heart, Star, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Heart, Star, Sparkles, AlertCircle } from "lucide-react";
 import { useTranslation } from "@/lib/useTranslation";
+import { useAuth } from "@/store/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
+  const { login, isLoading, error, clearError } = useAuth();
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    clearError();
     
-    // Simulate login
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate("/profile");
-    }, 1500);
+    try {
+      await login(phone, password);
+      toast({
+        title: t("success"),
+        description: t("login.subtitle"),
+      });
+      // Redirect to the page they tried to access, or profile by default
+      const from = (location.state as any)?.from?.pathname || "/profile";
+      navigate(from, { replace: true });
+    } catch (error: any) {
+      toast({
+        title: t("error"),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -103,17 +118,28 @@ export default function Login() {
               onSubmit={handleSubmit}
               className="space-y-6"
             >
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  {t("login.email")}
+                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                  {t("login.phone") || "Telefon"}
                 </Label>
                 <div className="relative">
                   <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t("login.emailPlaceholder")}
+                    id="phone"
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+998 90 123 45 67"
                     className="pl-4 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300 hover:border-purple-300"
                     required
                   />

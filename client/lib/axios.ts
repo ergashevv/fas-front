@@ -15,7 +15,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     // Get token from localStorage (Zustand persist)
-    const authStore = localStorage.getItem("auth-store");
+    const authStore = localStorage.getItem("auth-storage");
     if (authStore) {
       try {
         const { state } = JSON.parse(authStore);
@@ -42,7 +42,7 @@ instance.interceptors.response.use(
     // Handle 401 Unauthorized - could redirect to login
     if (error.response?.status === 401) {
       // Clear auth state if token is invalid
-      localStorage.removeItem("auth-store");
+      localStorage.removeItem("auth-storage");
       // Optionally redirect to login
       // window.location.href = "/login";
     }
