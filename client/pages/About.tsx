@@ -178,11 +178,73 @@ export default function About() {
           </motion.div>
         </div>
 
-        {/* CTA Section */}
+        {/* Loyalty Card Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
+          className="bg-gradient-to-br from-amber-400 via-yellow-500 to-orange-500 rounded-2xl p-8 md:p-12 shadow-2xl mb-8 relative overflow-hidden"
+        >
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16" />
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="text-5xl">💳</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-white">Jamg'arma kartasi</h2>
+            </div>
+            <p className="text-lg md:text-xl text-white/95 mb-6 max-w-3xl mx-auto">
+              Jamg'arma kartasi egasi bo'lib, har bir xaridingizdan bonuslar yig'ing! 
+              Bonuslaringiz bilan keyingi xaridlaringizda chegirmaga ega bo'ling.
+            </p>
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6 max-w-2xl mx-auto">
+              <div className="flex items-start gap-3 mb-4">
+                <span className="text-3xl">🎁</span>
+                <div className="text-left">
+                  <h3 className="font-bold text-white text-lg mb-2">Bonuslar tizimi:</h3>
+                  <ul className="space-y-2 text-white/90">
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">✓</span>
+                      <span>Har 1000 so'mdan 50 so'm bonus</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">✓</span>
+                      <span>Bonuslar bilan to'lov qilish imkoniyati</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <span className="text-xl">✓</span>
+                      <span>Maxsus takliflar va chegirmalar</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-white font-semibold text-lg">
+                Ro'yxatdan o'tish uchun Telegram botimizga murojaat qiling:
+              </p>
+              <a 
+                href="https://t.me/faskids_bot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-all shadow-xl hover:scale-105 transform"
+              >
+                <MessageCircle className="w-6 h-6" />
+                <span className="text-lg">@faskids_bot</span>
+              </a>
+              <p className="text-white/80 text-sm">
+                Botda ro'yxatdan o'ting va bonuslarni yig'ishni boshlang!
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
           className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl p-8 md:p-12 text-center text-white shadow-2xl"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Bizga tashrif buyuring!</h2>
