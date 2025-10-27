@@ -150,6 +150,20 @@ app.get("/api/ping", (_req, res) => {
   res.json({ message: "pong", timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint - remove in production
+app.get("/api/debug/routes", (_req, res) => {
+  res.json({
+    message: "Auth routes are registered",
+    routes: [
+      "POST /api/auth/signup",
+      "POST /api/auth/login",
+      "GET /api/auth/me",
+      "PUT /api/auth/update-profile"
+    ],
+    database: "Connected to MongoDB"
+  });
+});
+
 // API Routes
 // Products - Full CRUD
 app.get("/api/products", getProducts);

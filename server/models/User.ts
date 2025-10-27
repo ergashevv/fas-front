@@ -38,9 +38,9 @@ const AddressSchema = new Schema<IAddress>({
 const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true, lowercase: true, index: true },
+    email: { type: String, lowercase: true, sparse: true },
     password: { type: String, required: true },
-    phone: { type: String },
+    phone: { type: String, required: true, unique: true, index: true },
     addresses: { type: [AddressSchema], default: [] },
     wishlist: { type: [String], default: [] },
     recentlyViewed: { type: [String], default: [] }
