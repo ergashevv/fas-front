@@ -515,6 +515,26 @@ export default function ProductDetail() {
             </TabsContent>
           </Tabs>
         </motion.div>
+
+        {/* Image Zoom Modal */}
+        <Dialog open={isZoomOpen} onOpenChange={setIsZoomOpen}>
+          <DialogContent className="max-w-7xl w-full h-[90vh] p-0 bg-black/95">
+            <DialogClose className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors">
+              <X className="w-6 h-6 text-white" />
+            </DialogClose>
+            <div className="w-full h-full flex items-center justify-center p-8">
+              <img
+                src={selectedImage}
+                alt={product?.title}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/placeholder.svg";
+                }}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </Container>
     </div>
   );
