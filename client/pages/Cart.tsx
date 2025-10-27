@@ -58,48 +58,64 @@ export default function Cart() {
               {items.map((item) => (
                 <motion.div
                   key={item.productId}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex gap-4 bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 shadow-md hover:shadow-lg transition-shadow"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col sm:flex-row gap-4 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-2xl p-4 md:p-5 shadow-md hover:shadow-xl transition-all duration-300"
                 >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-24 h-24 object-cover rounded"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {item.color && `Rang: ${item.color}`}
-                      {item.size && ` | O'lcham: ${item.size}`}
-                    </p>
-                    <p className="font-bold text-primary mt-2">
-                      {formatPrice(item.price * item.qty)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-4">
-                    <button
-                      onClick={() => removeItem(item.productId)}
-                      className="p-1 hover:bg-red-100 rounded text-red-600"
-                    >
-                      <X size={20} />
-                    </button>
-                    <div className="flex items-center gap-2 border rounded-lg">
-                      <button
-                        onClick={() => updateQty(item.productId, item.qty - 1)}
-                        className="p-1 hover:bg-gray-100"
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="px-3 py-1 font-semibold">
-                        {item.qty}
-                      </span>
-                      <button
-                        onClick={() => updateQty(item.productId, item.qty + 1)}
-                        className="p-1 hover:bg-gray-100"
-                      >
-                        <Plus size={16} />
-                      </button>
+                  <Link to={`/products/${item.slug}`} className="flex-shrink-0">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full sm:w-28 sm:h-28 h-40 object-cover rounded-xl hover:scale-105 transition-transform duration-300"
+                    />
+                  </Link>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div>
+                      <Link to={`/products/${item.slug}`}>
+                        <h3 className="font-bold text-base md:text-lg hover:text-primary transition-colors">{item.title}</h3>
+                      </Link>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {item.color && (
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                            Rang: <span className="font-semibold">{item.color}</span>
+                          </span>
+                        )}
+                        {item.size && (
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+                            O'lcham: <span className="font-semibold">{item.size}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-3">
+                      <p className="font-bold text-lg md:text-xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        {formatPrice(item.price * item.qty)}
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 border-2 border-gray-200 rounded-lg bg-white">
+                          <button
+                            onClick={() => updateQty(item.productId, item.qty - 1)}
+                            className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <span className="px-3 py-1 font-bold min-w-[2rem] text-center">
+                            {item.qty}
+                          </span>
+                          <button
+                            onClick={() => updateQty(item.productId, item.qty + 1)}
+                            className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => removeItem(item.productId)}
+                          className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -118,20 +134,20 @@ export default function Cart() {
             <h2 className="font-bold text-lg mb-6">Savat xulasasi</h2>
             <div className="space-y-3 mb-4 pb-4 border-b text-sm">
               <div className="flex justify-between">
-                <span>Subtotal</span>
-                <span>{formatPrice(subtotal)}</span>
+                <span className="text-gray-600">Oraliq jami</span>
+                <span className="font-semibold">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span>Yetkazish</span>
+                <span className="text-gray-600">Yetkazish</span>
                 <span
-                  className={shipping === 0 ? "text-green-600 font-bold" : ""}
+                  className={shipping === 0 ? "text-green-600 font-bold" : "font-semibold"}
                 >
                   {shipping === 0 ? "Bepul" : formatPrice(shipping)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Soliq</span>
-                <span>{formatPrice(tax)}</span>
+                <span className="text-gray-600">Soliq</span>
+                <span className="font-semibold">{formatPrice(tax)}</span>
               </div>
             </div>
             <div className="flex justify-between font-bold text-lg mb-6">
