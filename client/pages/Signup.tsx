@@ -36,8 +36,11 @@ export default function Signup() {
     e.preventDefault();
     clearError();
     
+    console.log("📝 Form submitted with data:", { ...formData, password: "***", confirmPassword: "***" });
+    
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
+      console.log("❌ Passwords don't match");
       toast({
         title: t("error"),
         description: "Parollar mos kelmaydi",
@@ -47,13 +50,16 @@ export default function Signup() {
     }
 
     try {
+      console.log("🚀 Calling signup function...");
       await signup(formData.name, formData.email, formData.phone, formData.password);
+      console.log("✅ Signup successful!");
       toast({
         title: t("success"),
         description: "Ro'yxatdan o'tish muvaffaqiyatli",
       });
       navigate("/profile");
     } catch (error: any) {
+      console.error("❌ Signup failed in component:", error);
       toast({
         title: t("error"),
         description: error.message,

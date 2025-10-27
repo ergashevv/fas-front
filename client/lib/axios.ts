@@ -1,7 +1,11 @@
 import axios from "axios";
 
 const baseURL =
-  import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "https://api.faskids.shop/api" : "http://localhost:8080/api");
+  import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "https://api.faskids.shop" : "http://localhost:8080");
+
+console.log("🔧 Axios baseURL:", baseURL);
+console.log("🔧 PROD mode:", import.meta.env.PROD);
+console.log("🔧 VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
 
 const instance = axios.create({
   baseURL,
@@ -14,6 +18,9 @@ const instance = axios.create({
 // Request interceptor to add auth token
 instance.interceptors.request.use(
   (config) => {
+    console.log("📤 Request:", config.method?.toUpperCase(), config.baseURL + config.url);
+    console.log("📤 Request data:", config.data);
+    
     // Get token from localStorage (Zustand persist)
     const authStore = localStorage.getItem("auth-storage");
     if (authStore) {

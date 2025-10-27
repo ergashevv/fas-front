@@ -58,14 +58,17 @@ export const useAuth = create<AuthState>()(
       },
 
       signup: async (name: string, email: string, phone: string, password: string) => {
+        console.log("🔐 Signup called with:", { name, email, phone, password: "***" });
         set({ isLoading: true, error: null });
         try {
+          console.log("📡 Sending signup request to /api/auth/signup");
           const response = await axios.post("/api/auth/signup", { 
             name, 
             email, 
             phone, 
             password 
           });
+          console.log("✅ Signup response:", response.data);
           const { token, user } = response.data;
           
           set({ 
@@ -76,6 +79,8 @@ export const useAuth = create<AuthState>()(
             error: null 
           });
         } catch (error: any) {
+          console.error("❌ Signup error:", error);
+          console.error("❌ Error response:", error.response?.data);
           const errorMessage = error.response?.data?.message || "Signup failed";
           set({ 
             isLoading: false, 
