@@ -15,7 +15,8 @@ import { CommentForm } from "@/components/product/CommentForm";
 import { CommentsList } from "@/components/product/CommentsList";
 import { RecommendedProducts } from "@/components/product/RecommendedProducts";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
-import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle, Home, ChevronRight } from "lucide-react";
+import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle, Home, ChevronRight, ZoomIn, X } from "lucide-react";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -31,6 +32,8 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -274,16 +277,26 @@ export default function ProductDetail() {
         >
           {/* Images */}
           <div className="space-y-4">
-            <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
+            <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg group cursor-pointer"
+                 onClick={() => {
+                   setSelectedImage(product.images[0] || "/placeholder.svg");
+                   setIsZoomOpen(true);
+                 }}>
               <img
                 src={product.images[0] || "/placeholder.svg"}
                 alt={product.title}
-                className="w-full h-96 object-cover"
+                className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = "/placeholder.svg";
                 }}
               />
+              {/* Zoom Icon Overlay */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
+                  <ZoomIn className="w-6 h-6 text-gray-800" />
+                </div>
+              </div>
               {product.oldPrice && (
                 <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
@@ -297,6 +310,11 @@ export default function ProductDetail() {
                 {product.images.slice(1, 4).map((image, index) => (
                   <img
                     key={index}
+                    onClick={() => {
+                      setSelectedImage(image);
+                      setIsZoomOpen(true);
+                    }}
+                    className="cursor-pointer hover:opacity-75 transition-opacity"
                     src={image}
                     alt={`${product.title} ${index + 2}`}
                     className="w-20 h-20 object-cover rounded-lg border border-gray-200"
