@@ -67,11 +67,31 @@ export interface Order {
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   phone: string;
   addresses: Address[];
   wishlist: string[];
   recentlyViewed: string[];
+}
+
+export interface LoginRequest {
+  phone: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  name: string;
+  phone: string;
+  password: string;
+  email?: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  message: string;
+  token?: string;
+  user?: User;
+  error?: string;
 }
 
 export interface Comment {

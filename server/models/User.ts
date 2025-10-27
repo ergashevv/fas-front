@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import bcrypt from "bcryptjs";
 
 export interface IAddress {
   fullName: string;
@@ -11,16 +12,17 @@ export interface IAddress {
 }
 
 export interface IUser extends Document {
-  id: string;
+  _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   phone: string;
   addresses: IAddress[];
   wishlist: string[];
   recentlyViewed: string[];
   createdAt: Date;
   updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const AddressSchema = new Schema<IAddress>({
@@ -46,7 +48,7 @@ const UserSchema = new Schema<IUser>(
   {
     timestamps: true,
     toJSON: {
-      transform: (_doc, ret) => {
+      transform: (_doc, ret: any) => {
         ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
@@ -56,6 +58,33 @@ const UserSchema = new Schema<IUser>(
     }
   }
 );
+
+// Hash password before saving
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+  
+  if (!this.password) {
+    return next(new Error('Password is required'));
+  }
+  
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+// Compare password method
+UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  if (!this.password) {
+    return false;
+  }
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 export const User = mongoose.model<IUser>("User", UserSchema);
 

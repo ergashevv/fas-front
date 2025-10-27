@@ -1,145 +1,140 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Container } from "@/components/core/Container";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTranslation } from "@/lib/useTranslation";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { User, Phone, Mail, LogOut, ShoppingBag, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/store/useAuth";
 
 export default function Profile() {
-  const { t } = useTranslation();
-  
-  return (
-    <div className="min-h-screen bg-profile bg-pattern-circles relative overflow-hidden">
-      {/* Floating decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 left-10 w-12 h-12 bg-green-100 rounded-full opacity-40"
-          animate={{ y: [0, -18, 0], rotate: [0, 180, 360] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute top-60 right-20 w-10 h-10 bg-green-200 rounded-full opacity-30"
-          animate={{ y: [0, 22, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 5, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-40 left-20 w-14 h-14 bg-green-100 rounded-full opacity-35"
-          animate={{ y: [0, -15, 0], x: [0, 12, 0] }}
-          transition={{ duration: 7, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-8 h-8 bg-green-200 rounded-full opacity-40"
-          animate={{ y: [0, 20, 0], rotate: [0, -180, -360] }}
-          transition={{ duration: 4, repeat: Infinity }}
-        />
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Tizimdan chiqdingiz");
+    navigate("/");
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
       </div>
+    );
+  }
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10"
-      >
-        <Container className="py-12">
-        <motion.h1 
-          className="text-3xl font-bold mb-8 text-black"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 py-12">
+      <Container>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto"
         >
-          {t("personalCabinet")}
-        </motion.h1>
-
-      <Tabs defaultValue="dashboard" className="max-w-4xl">
-        <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-300">
-          <TabsTrigger value="dashboard" className="text-black data-[state=active]:bg-black data-[state=active]:text-white">{t("main")}</TabsTrigger>
-          <TabsTrigger value="orders" className="text-black data-[state=active]:bg-black data-[state=active]:text-white">{t("orders")}</TabsTrigger>
-          <TabsTrigger value="addresses" className="text-black data-[state=active]:bg-black data-[state=active]:text-white">{t("addresses")}</TabsTrigger>
-          <TabsTrigger value="wishlist" className="text-black data-[state=active]:bg-black data-[state=active]:text-white">{t("wishlist")}</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="dashboard" className="mt-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-6"
-          >
-            <div className="bg-white border border-gray-300 rounded-lg p-6">
-              <h2 className="font-bold text-lg mb-4 text-black">{t("personalInfo")}</h2>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-gray-600">{t("name")}</p>
-                  <p className="font-semibold text-black">Javohir Karimov</p>
+          {/* Profile Header */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
+                  <User className="w-10 h-10 text-white" />
                 </div>
                 <div>
-                  <p className="text-gray-600">{t("email")}</p>
-                  <p className="font-semibold text-black">javohir@example.com</p>
-                </div>
-                <div>
-                  <p className="text-gray-600">{t("phone")}</p>
-                  <p className="font-semibold text-black">+998 90 123 45 67</p>
+                  <h1 className="text-3xl font-bold text-gray-900">{user.name}</h1>
+                  <p className="text-gray-600">Profil</p>
                 </div>
               </div>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="flex items-center gap-2 text-red-600 border-red-600 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4" />
+                Chiqish
+              </Button>
             </div>
 
-            <div className="bg-black text-white border border-gray-300 rounded-lg p-6">
-              <h2 className="font-bold text-lg mb-2">
-                📊 {t("moySkladIntegration")}
-              </h2>
-              <p className="text-gray-300 text-sm">
-                {t("comingSoon")}
-              </p>
-            </div>
-          </motion.div>
-        </TabsContent>
-
-        <TabsContent value="orders" className="mt-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
-            <p className="text-gray-600">{t("noOrders")}</p>
-          </motion.div>
-        </TabsContent>
-
-        <TabsContent value="addresses" className="mt-6">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
-          >
-            <div className="bg-white border border-gray-300 rounded-lg p-6">
-              <div className="flex justify-between items-start mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <Phone className="w-5 h-5 text-purple-600" />
                 <div>
-                  <h3 className="font-semibold text-black">Toshkent</h3>
-                  <p className="text-sm text-gray-600">
-                    Chilonzor 12-kv, 34-uy
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    +998 90 123 45 67
-                  </p>
+                  <p className="text-sm text-gray-600">Telefon</p>
+                  <p className="font-semibold text-gray-900">{user.phone}</p>
                 </div>
-                <span className="text-xs bg-black text-white px-2 py-1 rounded">
-                  {t("primary")}
-                </span>
               </div>
+              {user.email && (
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                  <Mail className="w-5 h-5 text-purple-600" />
+                  <div>
+                    <p className="text-sm text-gray-600">Email</p>
+                    <p className="font-semibold text-gray-900">{user.email}</p>
+                  </div>
+                </div>
+              )}
             </div>
-          </motion.div>
-        </TabsContent>
+          </div>
 
-        <TabsContent value="wishlist" className="mt-6">
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => navigate("/orders")}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                  <ShoppingBag className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">Buyurtmalarim</h3>
+                  <p className="text-gray-600 text-sm">Barcha buyurtmalar</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => navigate("/products")}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-pink-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-900 text-lg">Sharhlarim</h3>
+                  <p className="text-gray-600 text-sm">Yozgan sharhlarim</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Info Card */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 mt-6 text-white"
           >
-            <p className="text-gray-600">
-              {t("noWishlist")}
+            <h3 className="text-2xl font-bold mb-2">Xush kelibsiz!</h3>
+            <p className="text-white/90">
+              Endi siz sharh qoldirish va buyurtma berish imkoniyatiga ega bo'ldingiz.
+              Xaridlaringizdan rohatlaning! 🎉
             </p>
           </motion.div>
-        </TabsContent>
-      </Tabs>
-    </Container>
-    </motion.div>
+        </motion.div>
+      </Container>
     </div>
   );
 }

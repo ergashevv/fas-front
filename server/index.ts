@@ -7,6 +7,7 @@ import connectDatabase from "./config/database";
 import { getProducts, getProductBySlug, createProduct, updateProduct, patchProduct, deleteProduct } from "./routes/products";
 import { getCategories, getCategoryBySlug, createCategory, updateCategory, patchCategory, deleteCategory } from "./routes/categories";
 import { getProductComments, createComment, updateComment, patchComment, deleteComment, markHelpful } from "./routes/comments";
+import { signup, login, getMe, updateProfile, authMiddleware } from "./routes/demo"; // Will be renamed to auth.ts
 
 const app = express();
 
@@ -166,12 +167,18 @@ app.put("/api/categories/:slug", updateCategory);
 app.patch("/api/categories/:slug", patchCategory);
 app.delete("/api/categories/:slug", deleteCategory);
 
-// Comments - Full CRUD
+// Auth Routes
+app.post("/api/auth/signup", signup);
+app.post("/api/auth/login", login);
+app.get("/api/auth/me", getMe);
+app.put("/api/auth/update-profile", authMiddleware, updateProfile);
+
+// Comments - Full CRUD (protected routes require auth)
 app.get("/api/products/:productId/comments", getProductComments);
-app.post("/api/products/:productId/comments", createComment);
-app.put("/api/comments/:commentId", updateComment);
-app.patch("/api/comments/:commentId", patchComment);
-app.delete("/api/comments/:commentId", deleteComment);
+app.post("/api/products/:productId/comments", authMiddleware, createComment);
+app.put("/api/comments/:commentId", authMiddleware, updateComment);
+app.patch("/api/comments/:commentId", authMiddleware, patchComment);
+app.delete("/api/comments/:commentId", authMiddleware, deleteComment);
 app.post("/api/comments/:commentId/helpful", markHelpful);
 
 // Swagger JSON endpoint

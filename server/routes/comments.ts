@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { Comment } from "../models/Comment";
 import { Product } from "../models/Product";
+import { AuthRequest } from "./demo"; // Will be from auth.ts
 
 /**
  * @swagger
@@ -126,10 +127,21 @@ export const getProductComments: RequestHandler = async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Comment'
  */
-export const createComment: RequestHandler = async (req, res) => {
+export const createComment: RequestHandler = async (req: AuthRequest, res) => {
   try {
     const { productId } = req.params;
-    const { userId, userName, rating, title, content, images, size, color } = req.body;
+    const { rating, title, content, images, size, color } = req.body;
+
+    // Get user from authenticated request
+    const userId = req.userId;
+    const userName = req.user?.name || "User";
+
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false,
+        message: "Tizimga kirish talab qilinadi" 
+      });
+    }
 
     // Create comment
     const comment = new Comment({

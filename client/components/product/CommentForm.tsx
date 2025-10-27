@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RatingStars } from "@/components/common/RatingStars";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, Send, Image as ImageIcon } from "lucide-react";
+import { Star, Send, Image as ImageIcon, LogIn } from "lucide-react";
+import { useAuth } from "@/store/useAuth";
 
 interface CommentFormProps {
   onSubmit: (comment: {
@@ -20,6 +22,7 @@ interface CommentFormProps {
 }
 
 export const CommentForm = ({ onSubmit, loading }: CommentFormProps) => {
+  const { isAuthenticated } = useAuth();
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -45,6 +48,41 @@ export const CommentForm = ({ onSubmit, loading }: CommentFormProps) => {
       setColor("");
     }
   };
+
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-pink-50">
+          <CardContent className="p-8 text-center">
+            <LogIn className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Sharh qoldirish uchun tizimga kiring
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Mahsulot haqida sharh qoldirish uchun avval ro'yxatdan o'tishingiz kerak
+            </p>
+            <div className="flex gap-3 justify-center">
+              <Link to="/login">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                  Kirish
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="outline">
+                  Ro'yxatdan o'tish
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

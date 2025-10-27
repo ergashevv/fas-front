@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+import { Search, ShoppingCart, User, Menu, X, LogIn } from "lucide-react";
 import { Logo } from "./Logo";
 import { Container } from "./Container";
 import { useUI } from "@/store/useUI";
@@ -10,12 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LanguageSwitcher } from "@/components/common/LanguageSwitcher";
 import { useTranslation } from "@/lib/useTranslation";
+import { useAuth } from "@/store/useAuth";
 
 export const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { showMobileMenu, setShowMobileMenu } = useUI();
   const cartItems = useCart((s) => s.items);
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -95,11 +97,23 @@ export const Header = () => {
 
             <div className="flex items-center gap-2 md:gap-4">
               {/* <LanguageSwitcher /> */}
-              <button className="p-2 hover:bg-secondary/20 rounded-full transition">
-                <User className="w-5 h-5" />
-              </button>
-              <button className="p-2 hover:bg-secondary/20 rounded-full transition">
-                <Search className="w-5 h-5 md:hidden" />
+              {isAuthenticated ? (
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    <span className="hidden md:inline">{user?.name}</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/login">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <LogIn className="w-5 h-5" />
+                    <span className="hidden md:inline">Kirish</span>
+                  </Button>
+                </Link>
+              )}
+              <button className="p-2 hover:bg-secondary/20 rounded-full transition md:hidden">
+                <Search className="w-5 h-5" />
               </button>
               <Link to="/cart">
                 <Button variant="ghost" size="sm" className="relative">
