@@ -1,0 +1,64 @@
+[
+  {
+    "id": "o1",
+    "date": "2024-10-20",
+    "items": [
+      {
+        "productId": "p1",
+        "title": "Cotton Basic Tee",
+        "slug": "cotton-basic-tee-girl-pink",
+        "price": 89000,
+        "qty": 2,
+        "color": "pink",
+        "size": "104",
+        "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=100&h=100&fit=crop"
+      }
+    ],
+    "totals": {
+      "subtotal": 178000,
+      "shipping": 0,
+      "tax": 17800,
+      "total": 195800
+    },
+    "status": "delivered",
+    "address": {
+      "fullName": "Javohir Karimov",
+      "phone": "+998 90 123 45 67",
+      "country": "Uzbekistan",
+      "city": "Toshkent",
+      "street": "Chilonzor 12-kv",
+      "zip": "100000"
+    }
+  },
+  {
+    "id": "o2",
+    "date": "2024-10-15",
+    "items": [
+      {
+        "productId": "p5",
+        "title": "Fleece Hoodie",
+        "slug": "fleece-hoodie-unisex-gray",
+        "price": 169000,
+        "qty": 1,
+        "color": "gray",
+        "size": "122",
+        "image": "https://images.unsplash.com/photo-1556821552-7f41c5d440db?w=100&h=100&fit=crop"
+      }
+    ],
+    "totals": {
+      "subtotal": 169000,
+      "shipping": 0,
+      "tax": 16900,
+      "total": 185900
+    },
+    "status": "in_transit",
+    "address": {
+      "fullName": "Javohir Karimov",
+      "phone": "+998 90 123 45 67",
+      "country": "Uzbekistan",
+      "city": "Toshkent",
+      "street": "Chilonzor 12-kv",
+      "zip": "100000"
+    }
+  }
+]

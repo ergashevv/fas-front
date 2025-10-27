@@ -1,0 +1,8 @@
+[
+  { "id": "c1", "slug": "tops", "title": "Верхняя одежда", "icon": "👕" },
+  { "id": "c2", "slug": "bottoms", "title": "Нижняя одежда", "icon": "👖" },
+  { "id": "c3", "slug": "sets", "title": "Комплекты", "icon": "👶" },
+  { "id": "c4", "slug": "outerwear", "title": "Верхняя одежда", "icon": "🧥" },
+  { "id": "c5", "slug": "shoes", "title": "Обувь", "icon": "👟" },
+  { "id": "c6", "slug": "accessories", "title": "Аксессуары", "icon": "🧢" }
+]

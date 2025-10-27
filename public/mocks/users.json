@@ -1,0 +1,22 @@
+[
+  {
+    "id": "u1",
+    "name": "Javohir Karimov",
+    "email": "javohir@example.com",
+    "phone": "+998 90 123 45 67",
+    "addresses": [
+      {
+        "id": "addr1",
+        "fullName": "Javohir Karimov",
+        "phone": "+998 90 123 45 67",
+        "country": "Uzbekistan",
+        "city": "Toshkent",
+        "street": "Chilonzor 12-kv, 34-uy",
+        "zip": "100000",
+        "isDefault": true
+      }
+    ],
+    "wishlist": ["p1", "p5", "p7"],
+    "recentlyViewed": ["p1", "p2", "p5", "p7"]
+  }
+]
