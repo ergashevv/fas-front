@@ -187,7 +187,7 @@ app.get("/api-docs.json", (_req, res) => {
   res.send(swaggerSpec);
 });
 
-export function createServer() {
+export function createServer(): express.Application {
   // Connect to database
   connectDatabase();
   

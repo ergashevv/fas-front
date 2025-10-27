@@ -36,7 +36,7 @@ export const useAuth = create<AuthState>()(
       login: async (phone: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.post("/auth/login", { phone, password });
+          const response = await axios.post("/api/auth/login", { phone, password });
           const { token, user } = response.data;
           
           set({ 
