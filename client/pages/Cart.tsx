@@ -15,28 +15,28 @@ export default function Cart() {
   const cartTotal = subtotal + shipping + tax;
 
   return (
-    <div className="min-h-screen bg-cart bg-pattern-waves relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 bg-pattern-dots relative overflow-hidden">
       {/* Floating decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-20 left-10 w-12 h-12 bg-yellow-100 rounded-full opacity-40"
-          animate={{ y: [0, -22, 0], rotate: [0, 360] }}
+          className="absolute top-20 left-10 w-12 h-12 bg-purple-200 rounded-full opacity-30"
+          animate={{ y: [0, -20, 0], rotate: [0, 180, 360] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
         <motion.div
-          className="absolute top-60 right-20 w-10 h-10 bg-yellow-200 rounded-full opacity-30"
-          animate={{ y: [0, 18, 0], scale: [1, 1.1, 1] }}
+          className="absolute top-40 right-20 w-8 h-8 bg-pink-200 rounded-full opacity-20"
+          animate={{ y: [0, 15, 0], x: [0, 10, 0] }}
           transition={{ duration: 6, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-40 left-20 w-14 h-14 bg-yellow-100 rounded-full opacity-35"
-          animate={{ y: [0, -15, 0], x: [0, -12, 0] }}
-          transition={{ duration: 5, repeat: Infinity }}
+          className="absolute bottom-40 left-20 w-16 h-16 bg-blue-100 rounded-full opacity-25"
+          animate={{ y: [0, -18, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 7, repeat: Infinity }}
         />
         <motion.div
-          className="absolute bottom-20 right-10 w-8 h-8 bg-yellow-200 rounded-full opacity-40"
-          animate={{ y: [0, 25, 0], rotate: [0, -180, -360] }}
-          transition={{ duration: 7, repeat: Infinity }}
+          className="absolute bottom-20 right-10 w-6 h-6 bg-purple-200 rounded-full opacity-30"
+          animate={{ y: [0, 20, 0], rotate: [0, -180, -360] }}
+          transition={{ duration: 5, repeat: Infinity }}
         />
       </div>
 
@@ -47,7 +47,7 @@ export default function Cart() {
         {/* Items */}
         <div className="lg:col-span-2">
           {items.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100">
               <p className="text-muted-foreground text-lg mb-4">Savat bo'sh</p>
               <Link to="/products">
                 <Button>Mahsulotlarni ko'rish</Button>
@@ -60,7 +60,7 @@ export default function Cart() {
                   key={item.productId}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex gap-4 border rounded-lg p-4"
+                  className="flex gap-4 bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-4 shadow-md hover:shadow-lg transition-shadow"
                 >
                   <img
                     src={item.image}
@@ -113,7 +113,7 @@ export default function Cart() {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="border rounded-lg p-6 h-fit sticky top-20"
+            className="bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-6 h-fit sticky top-20 shadow-lg"
           >
             <h2 className="font-bold text-lg mb-6">Savat xulasasi</h2>
             <div className="space-y-3 mb-4 pb-4 border-b text-sm">
@@ -140,7 +140,7 @@ export default function Cart() {
             </div>
 
             {subtotal < 150000 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-700">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-3 mb-4 text-sm text-blue-700">
                 <p>150,000 so'mdan ortiq sotib olsangiz, bepul yetkazish!</p>
                 <p className="font-bold">
                   Yana {formatPrice(150000 - subtotal)} kerak

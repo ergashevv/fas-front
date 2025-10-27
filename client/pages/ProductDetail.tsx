@@ -105,7 +105,9 @@ export default function ProductDetail() {
       image: product.images[0] || "/placeholder.svg",
     });
     
-    toast.success("Mahsulot savatga qo'shildi!");
+    toast.success("Mahsulot savatga qo'shildi!", {
+      duration: 3000,
+    });
   };
 
   const handleAddComment = (commentData: {

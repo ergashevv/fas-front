@@ -143,19 +143,32 @@ export const Header = () => {
               {/* <LanguageSwitcher /> */}
             </div>
             <nav className="flex flex-col gap-3">
-              <Link to="/gender/boy" className="text-sm font-medium py-2">
+              <Link 
+                to="/gender/boy" 
+                className="text-sm font-medium py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
                 {t("boys")}
               </Link>
-              <Link to="/gender/girl" className="text-sm font-medium py-2">
+              <Link 
+                to="/gender/girl" 
+                className="text-sm font-medium py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
                 {t("girls")}
               </Link>
               <Link
                 to="/category/accessories"
                 className="text-sm font-medium py-2"
+                onClick={() => setShowMobileMenu(false)}
               >
                 {t("accessories")}
               </Link>
-              <Link to="/products" className="text-sm font-medium py-2">
+              <Link 
+                to="/products" 
+                className="text-sm font-medium py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
                 {t("allProducts")}
               </Link>
             </nav>
