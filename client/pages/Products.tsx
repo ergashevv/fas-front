@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { Product } from "@shared/api";
 import { Container } from "@/components/core/Container";
 import { Filters } from "@/components/catalog/Filters";
@@ -9,7 +9,7 @@ import { useTranslation } from "@/lib/useTranslation";
 import { api } from "@/lib/api";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Home, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Products() {
@@ -113,6 +113,28 @@ export default function Products() {
       </div>
 
       <Container className="py-8 relative z-10">
+      {/* Breadcrumb */}
+      <motion.nav
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-2 text-sm mb-6 overflow-x-auto pb-2"
+      >
+        <Link 
+          to="/" 
+          className="flex items-center gap-1 text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+        >
+          <Home className="w-4 h-4" />
+          <span>Bosh sahifa</span>
+        </Link>
+        <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+        <span className="text-gray-900 font-medium whitespace-nowrap">
+          {searchParams.has("search") 
+            ? `"${searchParams.get("search")}" qidiruvi`
+            : "Mahsulotlar"
+          }
+        </span>
+      </motion.nav>
+
       <h1 className="text-3xl font-bold mb-8">
         {searchParams.has("search") 
           ? `"${searchParams.get("search")}" ${t("searchResults")}`

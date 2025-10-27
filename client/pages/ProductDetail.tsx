@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Product, Comment } from "@shared/api";
 import { Container } from "@/components/core/Container";
 import { Price } from "@/components/common/Price";
@@ -15,7 +15,7 @@ import { CommentForm } from "@/components/product/CommentForm";
 import { CommentsList } from "@/components/product/CommentsList";
 import { RecommendedProducts } from "@/components/product/RecommendedProducts";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
-import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle } from "lucide-react";
+import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle, Home, ChevronRight } from "lucide-react";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -217,6 +217,43 @@ export default function ProductDetail() {
       </div>
 
       <Container className="py-8 relative z-10">
+        {/* Breadcrumb */}
+        <motion.nav
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 text-sm mb-6 overflow-x-auto pb-2"
+        >
+          <Link 
+            to="/" 
+            className="flex items-center gap-1 text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+          >
+            <Home className="w-4 h-4" />
+            <span>Bosh sahifa</span>
+          </Link>
+          <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <Link 
+            to="/products" 
+            className="text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
+          >
+            Mahsulotlar
+          </Link>
+          {product.categorySlug && (
+            <>
+              <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <Link 
+                to={`/category/${product.categorySlug}`} 
+                className="text-gray-600 hover:text-primary transition-colors whitespace-nowrap capitalize"
+              >
+                {product.categorySlug}
+              </Link>
+            </>
+          )}
+          <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <span className="text-gray-900 font-medium whitespace-nowrap">
+            {product.title}
+          </span>
+        </motion.nav>
+
         {/* Product Main Info */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
