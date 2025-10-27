@@ -4,8 +4,8 @@ import cors from "cors";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import connectDatabase from "./config/database";
-import { getProducts, getProductBySlug } from "./routes/products";
-import { getCategories, getCategoryBySlug } from "./routes/categories";
+import { getProducts, getProductBySlug, createProduct, updateProduct, deleteProduct } from "./routes/products";
+import { getCategories, getCategoryBySlug, createCategory, updateCategory, deleteCategory } from "./routes/categories";
 import { getProductComments, createComment, markHelpful } from "./routes/comments";
 
 const app = express();
@@ -39,8 +39,8 @@ const swaggerOptions = {
       },
       servers: [
         {
-          url: "https://faskids.shop/api",
-          description: "Production server"
+          url: "https://api.faskids.shop",
+          description: "Production API server"
         },
         {
           url: "http://localhost:8080/api",
@@ -123,19 +123,46 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 // Swagger UI
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+/**
+ * @swagger
+ * /api/ping:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: pong
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ */
 // Health check
 app.get("/api/ping", (_req, res) => {
   res.json({ message: "pong", timestamp: new Date().toISOString() });
 });
 
 // API Routes
-// Products
+// Products - CRUD
 app.get("/api/products", getProducts);
+app.post("/api/products", createProduct);
 app.get("/api/products/:slug", getProductBySlug);
+app.put("/api/products/:slug", updateProduct);
+app.delete("/api/products/:slug", deleteProduct);
 
-// Categories
+// Categories - CRUD
 app.get("/api/categories", getCategories);
+app.post("/api/categories", createCategory);
 app.get("/api/categories/:slug", getCategoryBySlug);
+app.put("/api/categories/:slug", updateCategory);
+app.delete("/api/categories/:slug", deleteCategory);
 
 // Comments
 app.get("/api/products/:productId/comments", getProductComments);

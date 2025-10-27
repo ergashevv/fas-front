@@ -177,3 +177,141 @@ export const getProductBySlug: RequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/products:
+ *   post:
+ *     summary: Create a new product
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *           example:
+ *             slug: "test-product-slug"
+ *             title: "Test Product"
+ *             gender: "boy"
+ *             ageRange: "3-5y"
+ *             categorySlug: "tops"
+ *             price: 50000
+ *             colors: ["qizil", "ko'k"]
+ *             sizes: ["98", "104", "110"]
+ *             images: ["/placeholder.svg"]
+ *             available: true
+ *             description: "Test product description"
+ *             material: "100% paxta"
+ *             care: "30° da yuvish"
+ *     responses:
+ *       201:
+ *         description: Product created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+export const createProduct: RequestHandler = async (req, res) => {
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.status(201).json(product);
+  } catch (error: any) {
+    console.error("Error creating product:", error);
+    res.status(400).json({ message: error.message || "Invalid input" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/products/{slug}:
+ *   put:
+ *     summary: Update a product by slug
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product slug
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Product'
+ *     responses:
+ *       200:
+ *         description: Product updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ */
+export const updateProduct: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const product = await Product.findOneAndUpdate({ slug }, req.body, { new: true }).lean();
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (error: any) {
+    console.error("Error updating product:", error);
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/products/{slug}:
+ *   delete:
+ *     summary: Delete a product by slug
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product slug
+ *     responses:
+ *       200:
+ *         description: Product deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Product not found
+ */
+export const deleteProduct: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const product = await Product.findOneAndDelete({ slug });
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+

@@ -66,3 +66,91 @@ export const getCategoryBySlug: RequestHandler = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /api/categories:
+ *   post:
+ *     summary: Create a new category
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Category'
+ *           example:
+ *             slug: "new-category"
+ *             title: "New Category"
+ *             icon: "🏷️"
+ *     responses:
+ *       201:
+ *         description: Category created
+ *       400:
+ *         description: Invalid input
+ */
+export const createCategory: RequestHandler = async (req, res) => {
+  try {
+    const category = new Category(req.body);
+    await category.save();
+    res.status(201).json(category);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || "Invalid input" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/categories/{slug}:
+ *   put:
+ *     summary: Update a category
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Category'
+ *     responses:
+ *       200:
+ *         description: Category updated
+ *       404:
+ *         description: Category not found
+ */
+export const updateCategory: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const category = await Category.findOneAndUpdate({ slug }, req.body, { new: true }).lean();
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json(category);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/categories/{slug}:
+ *   delete:
+ *     summary: Delete a category
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Category deleted
+ *       404:
+ *         description: Category not found
+ */
+export const deleteCategory: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const category = await Category.findOneAndDelete({ slug });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json({ message: "Category deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
