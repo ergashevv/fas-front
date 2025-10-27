@@ -15,7 +15,7 @@ import { CommentForm } from "@/components/product/CommentForm";
 import { CommentsList } from "@/components/product/CommentsList";
 import { RecommendedProducts } from "@/components/product/RecommendedProducts";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
-import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle, Home, ChevronRight, ZoomIn, X } from "lucide-react";
+import { Heart, Share2, ShoppingCart, Minus, Plus, Star, MessageCircle, Home, ChevronRight, ZoomIn, X, ChevronLeft } from "lucide-react";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 
 export default function ProductDetail() {
@@ -34,6 +34,7 @@ export default function ProductDetail() {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -277,26 +278,64 @@ export default function ProductDetail() {
         >
           {/* Images */}
           <div className="space-y-4">
-            <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg group cursor-pointer"
-                 onClick={() => {
-                   setSelectedImage(product.images[0] || "/placeholder.svg");
-                   setIsZoomOpen(true);
-                 }}>
-              <img
-                src={product.images[0] || "/placeholder.svg"}
-                alt={product.title}
-                className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "/placeholder.svg";
-                }}
-              />
-              {/* Zoom Icon Overlay */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
-                  <ZoomIn className="w-6 h-6 text-gray-800" />
+            <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg group">
+              <div className="relative cursor-pointer"
+                   onClick={() => {
+                     setSelectedImage(product.images[currentImageIndex] || "/placeholder.svg");
+                     setIsZoomOpen(true);
+                   }}>
+                <img
+                  src={product.images[currentImageIndex] || "/placeholder.svg"}
+                  alt={product.title}
+                  className="w-full h-96 object-cover transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/placeholder.svg";
+                  }}
+                />
+                {/* Zoom Icon Overlay */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center pointer-events-none">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3">
+                    <ZoomIn className="w-6 h-6 text-gray-800" />
+                  </div>
                 </div>
               </div>
+              
+              {/* Navigation Arrows */}
+              {product.images.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex((prev) => 
+                        prev === 0 ? product.images.length - 1 : prev - 1
+                      );
+                    }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all z-10"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-gray-800" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentImageIndex((prev) => 
+                        prev === product.images.length - 1 ? 0 : prev + 1
+                      );
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all z-10"
+                  >
+                    <ChevronRight className="w-6 h-6 text-gray-800" />
+                  </button>
+                </>
+              )}
+              
+              {/* Image Counter */}
+              {product.images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
+                  {currentImageIndex + 1} / {product.images.length}
+                </div>
+              )}
+              
               {product.oldPrice && (
                 <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                   -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
@@ -306,18 +345,18 @@ export default function ProductDetail() {
             
             {/* Thumbnail images */}
             {product.images.length > 1 && (
-              <div className="flex gap-2">
-                {product.images.slice(1, 4).map((image, index) => (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {product.images.map((image, index) => (
                   <img
                     key={index}
-                    onClick={() => {
-                      setSelectedImage(image);
-                      setIsZoomOpen(true);
-                    }}
-                    className="cursor-pointer hover:opacity-75 transition-opacity"
+                    onClick={() => setCurrentImageIndex(index)}
                     src={image}
-                    alt={`${product.title} ${index + 2}`}
-                    className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                    alt={`${product.title} ${index + 1}`}
+                    className={`w-20 h-20 object-cover rounded-lg border-2 cursor-pointer transition-all flex-shrink-0 ${
+                      currentImageIndex === index
+                        ? 'border-purple-500 opacity-100'
+                        : 'border-gray-200 opacity-60 hover:opacity-100 hover:border-purple-300'
+                    }`}
                   />
                 ))}
               </div>
