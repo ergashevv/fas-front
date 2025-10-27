@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { Product, Comment } from "@shared/api";
+import { Product, Comment, Category } from "@shared/api";
 import { Container } from "@/components/core/Container";
 import { Price } from "@/components/common/Price";
 import { RatingStars } from "@/components/common/RatingStars";
@@ -21,6 +21,7 @@ export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
+  const [category, setCategory] = useState<Category | null>(null);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -44,6 +45,17 @@ export default function ProductDetail() {
           setProduct(found);
           setSelectedColor(found.colors[0]);
           setSelectedSize(found.sizes[0]);
+          
+          // Load category
+          if (found.categorySlug) {
+            try {
+              const categories = await api.categories.getAll();
+              const foundCategory = categories.find((c: Category) => c.slug === found.categorySlug);
+              setCategory(foundCategory || null);
+            } catch (error) {
+              console.error("Error loading category:", error);
+            }
+          }
           
           // Load recommended products
           if (found.recommendedProducts && found.recommendedProducts.length > 0) {
@@ -237,14 +249,14 @@ export default function ProductDetail() {
           >
             Mahsulotlar
           </Link>
-          {product.categorySlug && (
+          {category && (
             <>
               <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <Link 
-                to={`/category/${product.categorySlug}`} 
-                className="text-gray-600 hover:text-primary transition-colors whitespace-nowrap capitalize"
+                to={`/category/${category.slug}`} 
+                className="text-gray-600 hover:text-primary transition-colors whitespace-nowrap"
               >
-                {product.categorySlug}
+                {category.title}
               </Link>
             </>
           )}

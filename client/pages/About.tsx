@@ -241,21 +241,7 @@ export default function About() {
         </motion.div>
 
         {/* CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl p-8 md:p-12 text-center text-white shadow-2xl"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Bizga tashrif buyuring!</h2>
-          <p className="text-lg mb-6 opacity-90">Do'konimizda siz uchun eng yaxshi kiyimlar kutmoqda</p>
-          <Link 
-            to="/products"
-            className="inline-block bg-white text-purple-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors shadow-lg"
-          >
-            Mahsulotlarni ko'rish
-          </Link>
-        </motion.div>
+       
       </Container>
     </div>
   );

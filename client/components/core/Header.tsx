@@ -85,6 +85,12 @@ export const Header = () => {
               >
                 {t("accessories")}
               </Link>
+              <Link
+                to="/about"
+                className="text-sm font-medium hover:text-primary transition"
+              >
+                Biz haqimizda
+              </Link>
             </nav>
 
             <div className="flex items-center gap-2 md:gap-4">
@@ -170,6 +176,13 @@ export const Header = () => {
                 onClick={() => setShowMobileMenu(false)}
               >
                 {t("allProducts")}
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-sm font-medium py-2"
+                onClick={() => setShowMobileMenu(false)}
+              >
+                Biz haqimizda
               </Link>
             </nav>
           </Container>
