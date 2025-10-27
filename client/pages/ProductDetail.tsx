@@ -35,6 +35,8 @@ export default function ProductDetail() {
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const { addItem } = useCart();
 
   useEffect(() => {
@@ -561,7 +563,22 @@ export default function ProductDetail() {
             <DialogClose className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors">
               <X className="w-6 h-6 text-white" />
             </DialogClose>
-            <div className="w-full h-full flex items-center justify-center p-8">
+            <div 
+              className="w-full h-full flex items-center justify-center overflow-hidden cursor-crosshair"
+              onMouseMove={(e: React.MouseEvent<HTMLDivElement>) => {
+                if (zoomLevel > 1) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const x = ((e.clientX - rect.left) / rect.width) * 100;
+                  const y = ((e.clientY - rect.top) / rect.height) * 100;
+                  setMousePosition({ x, y });
+                }
+              }}
+              onWheel={(e: React.WheelEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                setZoomLevel(prev => Math.max(1, Math.min(3, prev + delta)));
+              }}
+            >
               <img
                 src={selectedImage}
                 alt={product?.title}
