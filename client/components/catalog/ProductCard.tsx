@@ -44,22 +44,24 @@ export const ProductCard = ({ product }: ProductCardProps) => {
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg animate-pulse-glow"
+              className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white px-2 py-1 rounded-full text-[10px] md:text-sm font-bold shadow-lg"
             >
               -{discountPercentage}%
             </motion.div>
           )}
           
           {/* Availability Badge */}
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-1.5 left-1.5">
             {product.available ? (
-              <div className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold flex items-center gap-1">
-                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                Mavjud
+              <div className="bg-green-500 text-white px-1.5 py-0.5 rounded-full text-[9px] md:text-[10px] font-semibold flex items-center gap-0.5">
+                <div className="w-1 h-1 bg-white rounded-full animate-pulse" />
+                <span className="hidden sm:inline">Mavjud</span>
+                <span className="sm:hidden">✓</span>
               </div>
             ) : (
-              <div className="bg-gray-500 text-white px-2 py-0.5 rounded-full text-[10px] font-semibold">
-                Tugagan
+              <div className="bg-gray-500 text-white px-1.5 py-0.5 rounded-full text-[9px] md:text-[10px] font-semibold">
+                <span className="hidden sm:inline">Tugagan</span>
+                <span className="sm:hidden">✗</span>
               </div>
             )}
           </div>
@@ -77,17 +79,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         {/* Content */}
-        <div className="p-3 space-y-2.5">
+        <div className="p-2 md:p-3 space-y-1.5 md:space-y-2.5 flex-1 flex flex-col">
           {/* Title */}
-          <h3 className="font-bold text-gray-900 text-sm line-clamp-2 group-hover:text-purple-600 transition-colors duration-200 leading-tight">
+          <h3 className="font-bold text-gray-900 text-xs md:text-sm line-clamp-2 group-hover:text-purple-600 transition-colors duration-200 leading-tight min-h-[2rem] md:min-h-[2.5rem]">
             {product.title}
           </h3>
           
           {/* Rating */}
           {product.rating && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <RatingStars rating={product.rating} size="sm" />
-              <span className="text-xs text-gray-500 font-medium">
+              <span className="text-[10px] md:text-xs text-gray-500 font-medium">
                 ({product.rating})
               </span>
             </div>
@@ -99,17 +101,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
             
             {/* Colors indicator */}
             {product.colors && product.colors.length > 0 && (
-              <div className="flex gap-1">
+              <div className="flex gap-0.5 md:gap-1">
                 {product.colors.slice(0, 3).map((color, index) => (
                   <div
                     key={index}
-                    className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm"
+                    className="w-3 h-3 md:w-3.5 md:h-3.5 rounded-full border border-white shadow-sm"
                     style={{ backgroundColor: getColorValue(color) }}
                     title={color}
                   />
                 ))}
                 {product.colors.length > 3 && (
-                  <div className="w-3.5 h-3.5 rounded-full bg-gray-300 border-2 border-white shadow-sm flex items-center justify-center text-[10px] font-bold text-gray-600">
+                  <div className="w-3 h-3 md:w-3.5 md:h-3.5 rounded-full bg-gray-300 border border-white shadow-sm flex items-center justify-center text-[8px] md:text-[10px] font-bold text-gray-600">
                     +{product.colors.length - 3}
                   </div>
                 )}
@@ -118,17 +120,17 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </div>
           
           {/* Gender and Age */}
-          <div className="flex items-center gap-2 text-xs">
-            <span className={`px-2 py-0.5 rounded-full font-semibold text-[11px] ${
+          <div className="flex items-center gap-1 md:gap-2 text-xs flex-wrap">
+            <span className={`px-1.5 md:px-2 py-0.5 rounded-full font-semibold text-[9px] md:text-[11px] whitespace-nowrap ${
               product.gender === 'boy' 
                 ? 'bg-blue-100 text-blue-700' 
                 : product.gender === 'girl'
                 ? 'bg-pink-100 text-pink-700'
                 : 'bg-purple-100 text-purple-700'
             }`}>
-              {product.gender === 'boy' ? '👦 O\'g\'il' : product.gender === 'girl' ? '👧 Qiz' : '👶 Unisex'}
+              {product.gender === 'boy' ? '👦 O\'g\'il' : product.gender === 'girl' ? '👧 Qiz' : '👶'}
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-semibold text-[11px]">
+            <span className="px-1.5 md:px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-semibold text-[9px] md:text-[11px] whitespace-nowrap">
               {product.ageRange}
             </span>
           </div>

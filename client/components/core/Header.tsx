@@ -88,7 +88,7 @@ export const Header = () => {
             </nav>
 
             <div className="flex items-center gap-2 md:gap-4">
-              <LanguageSwitcher />
+              {/* <LanguageSwitcher /> */}
               <button className="p-2 hover:bg-secondary/20 rounded-full transition">
                 <User className="w-5 h-5" />
               </button>
@@ -140,7 +140,7 @@ export const Header = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             </form>
             <div className="flex justify-center mb-4">
-              <LanguageSwitcher />
+              {/* <LanguageSwitcher /> */}
             </div>
             <nav className="flex flex-col gap-3">
               <Link to="/gender/boy" className="text-sm font-medium py-2">
