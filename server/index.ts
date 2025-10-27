@@ -4,9 +4,9 @@ import cors from "cors";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import connectDatabase from "./config/database";
-import { getProducts, getProductBySlug, createProduct, updateProduct, deleteProduct } from "./routes/products";
-import { getCategories, getCategoryBySlug, createCategory, updateCategory, deleteCategory } from "./routes/categories";
-import { getProductComments, createComment, markHelpful } from "./routes/comments";
+import { getProducts, getProductBySlug, createProduct, updateProduct, patchProduct, deleteProduct } from "./routes/products";
+import { getCategories, getCategoryBySlug, createCategory, updateCategory, patchCategory, deleteCategory } from "./routes/categories";
+import { getProductComments, createComment, updateComment, patchComment, deleteComment, markHelpful } from "./routes/comments";
 
 const app = express();
 
@@ -150,23 +150,28 @@ app.get("/api/ping", (_req, res) => {
 });
 
 // API Routes
-// Products - CRUD
+// Products - Full CRUD
 app.get("/api/products", getProducts);
 app.post("/api/products", createProduct);
 app.get("/api/products/:slug", getProductBySlug);
 app.put("/api/products/:slug", updateProduct);
+app.patch("/api/products/:slug", patchProduct);
 app.delete("/api/products/:slug", deleteProduct);
 
-// Categories - CRUD
+// Categories - Full CRUD
 app.get("/api/categories", getCategories);
 app.post("/api/categories", createCategory);
 app.get("/api/categories/:slug", getCategoryBySlug);
 app.put("/api/categories/:slug", updateCategory);
+app.patch("/api/categories/:slug", patchCategory);
 app.delete("/api/categories/:slug", deleteCategory);
 
-// Comments
+// Comments - Full CRUD
 app.get("/api/products/:productId/comments", getProductComments);
 app.post("/api/products/:productId/comments", createComment);
+app.put("/api/comments/:commentId", updateComment);
+app.patch("/api/comments/:commentId", patchComment);
+app.delete("/api/comments/:commentId", deleteComment);
 app.post("/api/comments/:commentId/helpful", markHelpful);
 
 // Swagger JSON endpoint

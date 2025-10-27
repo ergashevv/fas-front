@@ -102,7 +102,7 @@ export const createCategory: RequestHandler = async (req, res) => {
  * @swagger
  * /api/categories/{slug}:
  *   put:
- *     summary: Update a category
+ *     summary: Update a category (full update)
  *     tags: [Categories]
  *     requestBody:
  *       required: true
@@ -120,6 +120,40 @@ export const updateCategory: RequestHandler = async (req, res) => {
   try {
     const { slug } = req.params;
     const category = await Category.findOneAndUpdate({ slug }, req.body, { new: true }).lean();
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.json(category);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/categories/{slug}:
+ *   patch:
+ *     summary: Partially update a category
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             example:
+ *               title: "Updated Category Name"
+ *               icon: "🏆"
+ *     responses:
+ *       200:
+ *         description: Category partially updated
+ *       404:
+ *         description: Category not found
+ */
+export const patchCategory: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const category = await Category.findOneAndUpdate({ slug }, { $set: req.body }, { new: true }).lean();
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }

@@ -232,7 +232,7 @@ export const createProduct: RequestHandler = async (req, res) => {
  * @swagger
  * /api/products/{slug}:
  *   put:
- *     summary: Update a product by slug
+ *     summary: Update a product by slug (full update)
  *     tags: [Products]
  *     parameters:
  *       - in: path
@@ -269,6 +269,55 @@ export const updateProduct: RequestHandler = async (req, res) => {
     res.json(product);
   } catch (error: any) {
     console.error("Error updating product:", error);
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/products/{slug}:
+ *   patch:
+ *     summary: Partially update a product by slug
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: slug
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Product slug
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             description: Partial product data
+ *             example:
+ *               price: 55000
+ *               available: false
+ *     responses:
+ *       200:
+ *         description: Product partially updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Product'
+ *       404:
+ *         description: Product not found
+ */
+export const patchProduct: RequestHandler = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const product = await Product.findOneAndUpdate({ slug }, { $set: req.body }, { new: true }).lean();
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  } catch (error: any) {
+    console.error("Error patching product:", error);
     res.status(400).json({ message: error.message || "Server error" });
   }
 };

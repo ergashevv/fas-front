@@ -179,6 +179,102 @@ const updateProductRating = async (productId: string) => {
 
 /**
  * @swagger
+ * /api/comments/{commentId}:
+ *   put:
+ *     summary: Update a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               rating:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Comment updated
+ *       404:
+ *         description: Comment not found
+ */
+export const updateComment: RequestHandler = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findByIdAndUpdate(commentId, req.body, { new: true }).lean();
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    res.json(comment);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/comments/{commentId}:
+ *   patch:
+ *     summary: Partially update a comment
+ *     tags: [Comments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             example:
+ *               verified: true
+ *     responses:
+ *       200:
+ *         description: Comment partially updated
+ *       404:
+ *         description: Comment not found
+ */
+export const patchComment: RequestHandler = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findByIdAndUpdate(commentId, { $set: req.body }, { new: true }).lean();
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    res.json(comment);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message || "Server error" });
+  }
+};
+
+/**
+ * @swagger
+ * /api/comments/{commentId}:
+ *   delete:
+ *     summary: Delete a comment
+ *     tags: [Comments]
+ *     responses:
+ *       200:
+ *         description: Comment deleted
+ *       404:
+ *         description: Comment not found
+ */
+export const deleteComment: RequestHandler = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const comment = await Comment.findByIdAndDelete(commentId);
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+    res.json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * @swagger
  * /api/comments/{commentId}/helpful:
  *   post:
  *     summary: Mark a comment as helpful
