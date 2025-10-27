@@ -134,7 +134,7 @@ export default function Cart() {
             <h2 className="font-bold text-lg mb-6">Savat xulasasi</h2>
             <div className="space-y-3 mb-4 pb-4 border-b text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Oraliq jami</span>
+                <span className="text-gray-600">Jami</span>
                 <span className="font-semibold">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex justify-between">
