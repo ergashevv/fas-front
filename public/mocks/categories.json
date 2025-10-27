@@ -1,8 +1,8 @@
 [
-  { "id": "c1", "slug": "tops", "title": "Верхняя одежда", "icon": "👕" },
-  { "id": "c2", "slug": "bottoms", "title": "Нижняя одежда", "icon": "👖" },
-  { "id": "c3", "slug": "sets", "title": "Комплекты", "icon": "👶" },
-  { "id": "c4", "slug": "outerwear", "title": "Верхняя одежда", "icon": "🧥" },
-  { "id": "c5", "slug": "shoes", "title": "Обувь", "icon": "👟" },
-  { "id": "c6", "slug": "accessories", "title": "Аксессуары", "icon": "🧢" }
+  { "id": "c1", "slug": "tops", "title": "Futbolka va ko'ylaklar", "icon": "👕" },
+  { "id": "c2", "slug": "bottoms", "title": "Shimlar va shortlar", "icon": "👖" },
+  { "id": "c3", "slug": "sets", "title": "Komplektlar", "icon": "👶" },
+  { "id": "c4", "slug": "outerwear", "title": "Ustki kiyimlar", "icon": "🧥" },
+  { "id": "c5", "slug": "shoes", "title": "Oyoq kiyimlari", "icon": "👟" },
+  { "id": "c6", "slug": "accessories", "title": "Aksessuarlar", "icon": "🧢" }
 ]
