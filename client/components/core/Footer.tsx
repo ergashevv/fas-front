@@ -1,6 +1,7 @@
 import { Container } from "./Container";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -8,9 +9,15 @@ export const Footer = () => {
       <Container className="py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="font-bold text-lg mb-4">Kidding</h3>
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <img 
+                src="/images/logos/logo.PNG" 
+                alt="FAS KIDS" 
+                className="h-12 w-auto"
+              />
+            </Link>
             <p className="text-sm text-gray-300">
-              Bolalar uchun eng yaxshi kiyimlar.
+              Bolalar uchun quvonchli, qulay va zamonaviy kiyimlar yaratamiz. Sifatli materiallar, xavfsiz dizaynlar va hamyonbop narxlar.
             </p>
           </div>
           <div>
@@ -81,7 +88,7 @@ export const Footer = () => {
           </div>
 
           <div className="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
-            <p>&copy; 2024 Kidding. Hamma huquqlar himoyalangan.</p>
+            <p>&copy; 2024 FAS Kids. Hamma huquqlar himoyalangan.</p>
           </div>
         </div>
       </Container>

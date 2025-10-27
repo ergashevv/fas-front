@@ -35,7 +35,7 @@ export const ProductScroller = ({ title, filter }: ProductScrollerProps) => {
     return (
       <div className="py-12">
         <h2 className="text-2xl font-bold mb-6">{title}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="animate-pulse">
               <div className="bg-gray-200 h-64 rounded-lg mb-4" />
@@ -50,7 +50,7 @@ export const ProductScroller = ({ title, filter }: ProductScrollerProps) => {
     <div className="py-12">
       <h2 className="text-2xl font-bold mb-6">{title}</h2>
       <motion.div
-        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 auto-rows-fr"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}

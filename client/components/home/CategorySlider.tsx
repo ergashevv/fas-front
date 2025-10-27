@@ -66,22 +66,22 @@ export const CategorySlider = () => {
     <div className="py-8">
       <h2 className="text-2xl font-bold mb-6">Kategoriyalar</h2>
       <motion.div
-        className="grid grid-cols-3 md:grid-cols-6 gap-4"
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 md:gap-4"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
       >
         {categories.map((cat) => (
-          <motion.div key={cat.id} variants={itemVariants}>
-            <Link to={`/category/${cat.slug}`}>
+          <motion.div key={cat.id} variants={itemVariants} className="w-full">
+            <Link to={`/category/${cat.slug}`} className="block">
               <motion.div
-                className={`${cat.color} rounded-lg p-6 text-center cursor-pointer transition`}
+                className={`${cat.color} rounded-2xl p-4 md:p-6 text-center cursor-pointer transition aspect-[3/4] flex flex-col items-center justify-center`}
                 whileHover={{ scale: 1.05, y: -5 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <div className="text-4xl mb-2">{cat.icon}</div>
-                <p className="text-sm font-semibold text-gray-800">
+                <div className="text-3xl sm:text-4xl md:text-5xl mb-2 md:mb-3">{cat.icon}</div>
+                <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-800 leading-tight">
                   {cat.title}
                 </p>
               </motion.div>
