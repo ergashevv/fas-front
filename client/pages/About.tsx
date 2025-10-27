@@ -206,7 +206,7 @@ export default function About() {
                   <ul className="space-y-2 text-white/90">
                     <li className="flex items-center gap-2">
                       <span className="text-xl">✓</span>
-                      <span>Har 1000 so'mdan 50 so'm bonus</span>
+                      <span>Har xariddan 3% keshbek</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <span className="text-xl">✓</span>
