@@ -2,14 +2,72 @@
 <html lang="uz">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="FasKids - Bolalar uchun kiyim-kechak do'koni" />
-    <title>FasKids - Bolalar uchun eng yaxshi kiyimlar</title>
+
+    <!-- Favicon & PWA (agar bo'lsa) -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Indexing -->
+    <meta name="robots" content="index,follow" />
+
+    <!-- Primary SEO -->
+    <title>FAS Kids — Bolalar kiyimlari | Sifatli, xavfsiz, hamyonbop</title>
+    <meta
+      name="description"
+      content="FAS Kids: bolalar uchun qulay, xavfsiz va zamonaviy kiyimlar. Sifatli materiallar, xavfsiz dizaynlar va hamyonbop narxlar — tez yetkazib berish."
+    />
+    <link rel="canonical" href="https://faskids.shop/" />
+
+    <!-- Theme color (mobil brauzerlar uchun) -->
+    <meta name="theme-color" content="#0ea5e9" />
+
+    <!-- Open Graph (Facebook/Telegram/LinkedIn) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="FAS Kids — Bolalar kiyimlari" />
+    <meta property="og:description" content="Qulay, xavfsiz va hamyonbop bolalar kiyimlari." />
+    <meta property="og:url" content="https://faskids.shop/" />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:image:alt" content="FAS Kids brend baneri" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FAS Kids — Bolalar kiyimlari" />
+    <meta name="twitter:description" content="Qulay, xavfsiz va hamyonbop bolalar kiyimlari." />
+    <meta name="twitter:image" content="/og-image.jpg" />
+
+    <!-- Structured Data (Organization + Website) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "url": "https://faskids.shop/",
+        "name": "FAS Kids",
+        "logo": "https://faskids.shop/logo.png",
+        "sameAs": []
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://faskids.shop/",
+        "name": "FAS Kids",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://faskids.shop/search?q={query}",
+          "query-input": "required name=query"
+        }
+      }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
+    <!-- Sizning kirish faylingiz: -->
     <script type="module" src="/client/App.tsx"></script>
   </body>
 </html>

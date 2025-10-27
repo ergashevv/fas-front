@@ -88,7 +88,7 @@ const OrderSchema = new Schema<IOrder>(
         delete ret._id;
         delete ret.__v;
         // Format date for frontend
-        ret.date = ret.createdAt.toISOString().split('T')[0];
+        // ret.date = ret.createdAt.toISOString().split('T')[0];
         return ret;
       }
     }
