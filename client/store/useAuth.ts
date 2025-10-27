@@ -60,7 +60,7 @@ export const useAuth = create<AuthState>()(
       signup: async (name: string, email: string, phone: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await axios.post("/auth/signup", { 
+          const response = await axios.post("/api/auth/signup", { 
             name, 
             email, 
             phone, 
@@ -107,7 +107,7 @@ export const useAuth = create<AuthState>()(
         if (!token) return;
 
         try {
-          const response = await axios.get("/auth/me", {
+          const response = await axios.get("/api/auth/me", {
             headers: { Authorization: `Bearer ${token}` }
           });
           set({ user: response.data.user, isAuthenticated: true });
