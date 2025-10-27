@@ -6,12 +6,12 @@ export const api = {
   products: {
     getAll: async (params?: Record<string, any>): Promise<{ products: Product[]; total: number; page: number; limit: number }> => {
       const queryString = params ? new URLSearchParams(params).toString() : "";
-      const response = await fetch(`${API_BASE}/products${queryString ? `?${queryString}` : ""}`);
+      const response = await fetch(`${API_BASE}/api/products${queryString ? `?${queryString}` : ""}`);
       if (!response.ok) throw new Error("Failed to fetch products");
       return await response.json();
     },
     getBySlug: async (slug: string): Promise<Product> => {
-      const response = await fetch(`${API_BASE}/products/${slug}`);
+      const response = await fetch(`${API_BASE}/api/products/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch product");
       return await response.json();
     }
@@ -19,12 +19,12 @@ export const api = {
   
   categories: {
     getAll: async (): Promise<Category[]> => {
-      const response = await fetch(`${API_BASE}/categories`);
+      const response = await fetch(`${API_BASE}/api/categories`);
       if (!response.ok) throw new Error("Failed to fetch categories");
       return await response.json();
     },
     getBySlug: async (slug: string): Promise<Category> => {
-      const response = await fetch(`${API_BASE}/categories/${slug}`);
+      const response = await fetch(`${API_BASE}/api/categories/${slug}`);
       if (!response.ok) throw new Error("Failed to fetch category");
       return await response.json();
     }
@@ -33,12 +33,12 @@ export const api = {
   comments: {
     getByProduct: async (productId: string, params?: { sort?: string; filter?: string }): Promise<Comment[]> => {
       const queryString = params ? new URLSearchParams(params).toString() : "";
-      const response = await fetch(`${API_BASE}/products/${productId}/comments${queryString ? `?${queryString}` : ""}`);
+      const response = await fetch(`${API_BASE}/api/products/${productId}/comments${queryString ? `?${queryString}` : ""}`);
       if (!response.ok) throw new Error("Failed to fetch comments");
       return await response.json();
     },
     create: async (productId: string, commentData: Partial<Comment>): Promise<Comment> => {
-      const response = await fetch(`${API_BASE}/products/${productId}/comments`, {
+      const response = await fetch(`${API_BASE}/api/products/${productId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(commentData)
@@ -47,7 +47,7 @@ export const api = {
       return await response.json();
     },
     markHelpful: async (commentId: string): Promise<void> => {
-      const response = await fetch(`${API_BASE}/comments/${commentId}/helpful`, {
+      const response = await fetch(`${API_BASE}/api/comments/${commentId}/helpful`, {
         method: "POST"
       });
       if (!response.ok) throw new Error("Failed to mark comment as helpful");
