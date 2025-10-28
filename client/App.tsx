@@ -38,7 +38,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const { isAuthenticated, token, fetchUser } = useAuth();
+  const { isAuthenticated, isLoading, token, fetchUser } = useAuth();
   const location = useLocation();
 
   useEffect(() => {
@@ -48,23 +48,51 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     }
   }, [token, isAuthenticated, fetchUser]);
 
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    // Redirect to login page but save the attempted location
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
 };
 
+// Guest Route Component - Only for non-authenticated users
+const GuestRoute = ({ children }: { children: ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect to home if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner position="top-center" />
-      <BrowserRouter>
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 bg-pattern-dots">
+    <BrowserRouter>
+      <TooltipProvider>
+        <div className="flex flex-col min-h-screen">
           <Header />
-          <main className="flex-1 relative">
+          <main className="flex-grow">
+            <ScrollToTop />
             <ScrollToTopOnRouteChange />
             <Routes>
               <Route path="/" element={<Index />} />
@@ -73,21 +101,65 @@ const App = () => (
               <Route path="/category/:slug" element={<Category />} />
               <Route path="/gender/:gender" element={<Gender />} />
               <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-              <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+              
+              {/* Protected Routes */}
+              <Route
+                path="/checkout"
+                element={
+                  <ProtectedRoute>
+                    <Checkout />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/orders/:id"
+                element={
+                  <ProtectedRoute>
+                    <OrderDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/*"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              
+              {/* Public Routes */}
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              
+              {/* Guest Only Routes */}
+              <Route
+                path="/login"
+                element={
+                  <GuestRoute>
+                    <Login />
+                  </GuestRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <GuestRoute>
+                    <Signup />
+                  </GuestRoute>
+                }
+              />
+              
+              {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
           <Footer />
-          <ScrollToTop />
         </div>
-      </BrowserRouter>
-    </TooltipProvider>
+        <Toaster />
+        <Sonner />
+      </TooltipProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

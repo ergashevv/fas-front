@@ -1,8 +1,88 @@
-import { Product, Category, Comment } from "@shared/api";
+import { Product, Category, Comment, Order, User } from "@shared/api";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? "https://api.faskids.shop" : "/api");
+export type { User }; // Re-export the User type
+
+// Use VITE_API_BASE from .env or default to localhost:8080 for development
+const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? "http://localhost:8080" : "https://faskids.shop");
+
+// Helper function to get auth headers
+function getAuthHeader() {
+  const token = localStorage.getItem("auth_token");
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+// Helper function to handle API responses
+async function handleResponse<T>(response: Response): Promise<T> {
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Request failed');
+  }
+  return data;
+}
 
 export const api = {
+  // Auth endpoints
+  auth: {
+    signup: async (userData: { name: string; email: string; password: string; phone?: string; role?: string }): Promise<{ user: User; token: string }> => {
+      const response = await fetch(`${API_BASE}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+      return handleResponse(response);
+    },
+    login: async (email: string, password: string): Promise<{ user: User; token: string }> => {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      return handleResponse(response);
+    },
+    getMe: async (): Promise<User> => {
+      const response = await fetch(`${API_BASE}/api/auth/me`, {
+        headers: { ...getAuthHeader() },
+      });
+      const data = await handleResponse<{ user: User }>(response);
+      return data.user;
+    },
+  },
+
+  // Order endpoints
+  orders: {
+    create: async (orderData: any): Promise<Order> => {
+      const response = await fetch(`${API_BASE}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(orderData),
+      });
+      return handleResponse(response);
+    },
+    getMyOrders: async (): Promise<Order[]> => {
+      const response = await fetch(`${API_BASE}/api/orders/my`, {
+        headers: { ...getAuthHeader() },
+      });
+      const data = await handleResponse<{ orders: Order[] }>(response);
+      return data.orders;
+    },
+    getAllOrders: async (): Promise<Order[]> => {
+      const response = await fetch(`${API_BASE}/api/orders`, {
+        headers: { ...getAuthHeader() },
+      });
+      const data = await handleResponse<{ orders: Order[] }>(response);
+      return data.orders;
+    },
+    updateOrderStatus: async (orderId: string, status: string): Promise<Order> => {
+      const response = await fetch(`${API_BASE}/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify({ status }),
+      });
+      return handleResponse(response);
+    },
+  },
+
+  // Existing product endpoints
   products: {
     getAll: async (params?: Record<string, any>): Promise<{ products: Product[]; total: number; page: number; limit: number }> => {
       const queryString = params ? new URLSearchParams(params).toString() : "";
