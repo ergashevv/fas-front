@@ -80,6 +80,19 @@ export const useAuth = create<AuthState>()(
             isLoading: false,
             error: null
           });
+          return;
+        }
+
+        try {
+          const { user, token } = await api.auth.login(phone, password);
+          localStorage.setItem('auth_token', token);
+          set({ 
+            user: user as AuthUser,
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null
+          });
         } catch (error: any) {
           // Clear any invalid token on error
           localStorage.removeItem('auth_token');

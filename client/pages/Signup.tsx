@@ -51,7 +51,7 @@ export default function Signup() {
 
     try {
       console.log("🚀 Calling signup function...");
-      await signup(formData.name, formData.email, formData.phone, formData.password);
+      await signup({ name: formData.name, phone: formData.phone, password: formData.password });
       console.log("✅ Signup successful!");
       toast({
         title: t("success"),

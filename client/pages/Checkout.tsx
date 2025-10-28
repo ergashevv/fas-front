@@ -26,7 +26,13 @@ export default function Checkout() {
     zip: "100000",
   });
 
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [region, setRegion] = useState<{ code: string; name: string } | null>(() => {
+    const code = localStorage.getItem("fas.region-code");
+    const name = localStorage.getItem("fas.region-name");
+    return code && name ? { code, name } : null;
+  });
+  const [delivery, setDelivery] = useState<{ method: "courier_door" | "pickup"; fee: number; etaDays: number }>({ method: "courier_door", fee: 0, etaDays: 2 });
+  const [paymentMethod, setPaymentMethod] = useState<"payme" | "click" | "cod">("cod");
 
   if (items.length === 0) {
     return (
@@ -37,7 +43,9 @@ export default function Checkout() {
     );
   }
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    if (!region) { return toast.error("Iltimos, viloyatni tanlang"); }
+
     const order = {
       id: `ORD-${Date.now()}`,
       date: new Date().toISOString().split("T")[0],
@@ -47,10 +55,38 @@ export default function Checkout() {
       address: formData,
     };
 
-    localStorage.setItem(`order-${order.id}`, JSON.stringify(order));
-    clearCart();
-    toast.success("Buyurtma qabul qilindi!");
-    navigate(`/orders/${order.id}`);
+    try {
+      // Create backend order for payment flow
+      const res = await fetch(`/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
+        number: order.id,
+        items: items,
+        totals: { itemsTotal: subtotal, deliveryFee: shipping, discount: 0, grandTotal: cartTotal },
+        region,
+        address: { city: formData.city, street: formData.street },
+        contact: { fullName: formData.fullName, phone: formData.phone },
+        delivery: { method: delivery.method, fee: shipping, etaDays: delivery.etaDays },
+        payment: { method: paymentMethod, status: 'awaiting_payment' }
+      })});
+      const created = await res.json();
+
+      if (paymentMethod === 'cod') {
+        clearCart();
+        navigate(`/payment/success?orderId=${created._id}`);
+        return;
+      }
+
+      if (paymentMethod === 'payme') {
+        const p = await fetch(`/api/payments/payme/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: created._id, amount: cartTotal })});
+        const data = await p.json();
+        window.location.href = data.redirectUrl;
+      } else if (paymentMethod === 'click') {
+        const p = await fetch(`/api/payments/click/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: created._id, amount: cartTotal })});
+        const data = await p.json();
+        window.location.href = data.redirectUrl;
+      }
+    } catch {
+      toast.error("Xatolik yuz berdi");
+    }
   };
 
   const steps = [
@@ -151,58 +187,21 @@ export default function Checkout() {
 
             {step === 2 && (
               <div className="space-y-4">
-                <h2 className="font-bold text-lg mb-6">To'lov Usuli</h2>
+                <h2 className="font-bold text-lg mb-6">To‘lov turi</h2>
                 <div className="space-y-3">
-                  <label
-                    className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{
-                      borderColor:
-                        paymentMethod === "card" ? "#e74c3c" : "#ccc",
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="card"
-                      checked={paymentMethod === "card"}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="ml-3 font-semibold">
-                      Kredit Kartasi (Mock)
-                    </span>
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "payme" ? "#7b68ee" : "#ccc" }}>
+                    <input type="radio" name="payment" value="payme" checked={paymentMethod === "payme"} onChange={() => setPaymentMethod("payme")} className="w-4 h-4" />
+                    <span className="ml-3 font-semibold">Payme</span>
                   </label>
-                  <label
-                    className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                    style={{
-                      borderColor:
-                        paymentMethod === "cash" ? "#e74c3c" : "#ccc",
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="cash"
-                      checked={paymentMethod === "cash"}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className="w-4 h-4"
-                    />
-                    <span className="ml-3 font-semibold">
-                      Yetkazish vaqtida to'lash
-                    </span>
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "click" ? "#7b68ee" : "#ccc" }}>
+                    <input type="radio" name="payment" value="click" checked={paymentMethod === "click"} onChange={() => setPaymentMethod("click")} className="w-4 h-4" />
+                    <span className="ml-3 font-semibold">Click</span>
+                  </label>
+                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "cod" ? "#7b68ee" : "#ccc" }}>
+                    <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="w-4 h-4" />
+                    <span className="ml-3 font-semibold">Naqd (kuryerga)</span>
                   </label>
                 </div>
-                {paymentMethod === "card" && (
-                  <div className="mt-6 space-y-3 bg-gray-50 p-4 rounded-lg">
-                    <Input placeholder="Karta Raqami (16 raqam)" />
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input placeholder="MM/YY" />
-                      <Input placeholder="CVC" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
 
             {step === 3 && (
               <div className="space-y-4">
@@ -219,7 +218,7 @@ export default function Checkout() {
                   <div className="flex justify-between">
                     <span>To'lov:</span>
                     <span className="font-semibold">
-                      {paymentMethod === "card" ? "Karta" : "Yetkazishda"}
+                      {paymentMethod === "payme" ? "Payme" : paymentMethod === "click" ? "Click" : "Naqd"}
                     </span>
                   </div>
                 </div>

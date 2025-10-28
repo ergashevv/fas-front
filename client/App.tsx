@@ -85,6 +85,8 @@ const GuestRoute = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 }
 
+
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
@@ -105,11 +107,7 @@ const App = () => (
               {/* Protected Routes */}
               <Route
                 path="/checkout"
-                element={
-                  <ProtectedRoute>
-                    <Checkout />
-                  </ProtectedRoute>
-                }
+                element={<Checkout />}
               />
               <Route
                 path="/orders/:id"
@@ -150,6 +148,8 @@ const App = () => (
                 }
               />
               
+              <Route path="/payment/success" element={<div className="p-10 text-center">To‘lov muvaffaqiyatli! Rahmat.</div>} />
+              <Route path="/payment/fail" element={<div className="p-10 text-center">To‘lov bekor qilindi yoki xatolik yuz berdi.</div>} />
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>

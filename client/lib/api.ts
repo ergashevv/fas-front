@@ -105,6 +105,30 @@ export const api = {
     }
   },
   
+  shipping: {
+    quote: async (region: string, method: string, weight: number): Promise<{ fee: number; etaDays: number }> => {
+      const params = new URLSearchParams({ region, method, weight: String(weight) });
+      const response = await fetch(`${API_BASE}/api/shipping/quote?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to get quote");
+      return await response.json();
+    }
+  },
+
+  payments: {
+    createPayme: async (orderId: string, amount: number): Promise<{ intentId: string; redirectUrl: string }> => {
+      const response = await fetch(`${API_BASE}/api/payments/payme/create`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...getAuthHeader() }, body: JSON.stringify({ orderId, amount })
+      });
+      return handleResponse(response);
+    },
+    createClick: async (orderId: string, amount: number): Promise<{ intentId: string; redirectUrl: string }> => {
+      const response = await fetch(`${API_BASE}/api/payments/click/create`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...getAuthHeader() }, body: JSON.stringify({ orderId, amount })
+      });
+      return handleResponse(response);
+    }
+  },
+  
   categories: {
     getAll: async (): Promise<Category[]> => {
       const response = await fetch(`${API_BASE}/api/categories`);
