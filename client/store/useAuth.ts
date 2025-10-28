@@ -8,6 +8,14 @@ interface AuthUser extends User {
   role: UserRole;
 }
 
+// Default admin user
+const DEFAULT_ADMIN = {
+  phone: '+998507266007',
+  password: 'faskids6007',
+  name: 'Admin User',
+  role: 'admin' as const,
+};
+
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
@@ -16,14 +24,15 @@ interface AuthState {
   error: string | null;
   
   // Actions
-  login: (email: string, password: string) => Promise<void>;
-  signup: (userData: { name: string; email: string; password: string; phone?: string; role?: UserRole }) => Promise<void>;
+  login: (phone: string, password: string) => Promise<void>;
+  signup: (userData: { name: string; phone: string; password: string }) => Promise<void>;
   logout: () => void;
   updateUser: (user: Partial<AuthUser>) => void;
   clearError: () => void;
   fetchUser: () => Promise<void>;
   
   // Helpers
+  validatePhone: (phone: string) => boolean;
   hasRole: (role: UserRole) => boolean;
   hasAnyRole: (roles: UserRole[]) => boolean;
 }
@@ -37,16 +46,35 @@ export const useAuth = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      login: async (email: string, password: string) => {
+      // Validate phone number format: +998-XX-XXX-XX-XX
+      validatePhone: (phone: string): boolean => {
+        const phoneRegex = /^\+998-\d{2}-\d{3}-\d{2}-\d{2}$/;
+        return phoneRegex.test(phone);
+      },
+      
+      login: async (phone: string, password: string) => {
         set({ isLoading: true, error: null });
-        try {
-          const { user, token } = await api.auth.login(email, password);
+        
+        // Handle default admin login
+        if (phone === DEFAULT_ADMIN.phone && password === DEFAULT_ADMIN.password) {
+          const adminUser = {
+            id: 'admin-1',
+            name: DEFAULT_ADMIN.name,
+            email: 'admin@faskids.uz',
+            phone: DEFAULT_ADMIN.phone,
+            role: DEFAULT_ADMIN.role,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            addresses: [],
+            wishlist: [],
+            recentlyViewed: []
+          };
           
-          // Store token in localStorage for persistence
+          const token = 'admin-token-' + Date.now();
           localStorage.setItem('auth_token', token);
           
           set({ 
-            user: user as AuthUser, 
+            user: adminUser, 
             token,
             isAuthenticated: true,
             isLoading: false,
@@ -62,20 +90,33 @@ export const useAuth = create<AuthState>()(
             error: errorMessage,
             isAuthenticated: false 
           });
-          throw error;
         }
       },
 
       signup: async (userData) => {
         set({ isLoading: true, error: null });
+        
+        // Validate phone number format
+        if (!get().validatePhone(userData.phone)) {
+          const error = 'Iltimos, telefon raqamingizni +998-XX-XXX-XX-XX formatida kiriting';
+          set({ error, isLoading: false });
+          throw new Error(error);
+        }
+        
         try {
-          const { user, token } = await api.auth.signup(userData);
+          // Format phone to remove dashes for backend
+          const formattedPhone = userData.phone.replace(/-/g, '');
+          
+          const { user, token } = await api.auth.signup({
+            ...userData,
+            phone: formattedPhone,
+          });
           
           // Store token in localStorage for persistence
           localStorage.setItem('auth_token', token);
           
           set({ 
-            user: user as AuthUser,
+            user: { ...user, phone: userData.phone } as AuthUser, // Keep formatted phone with dashes
             token,
             isAuthenticated: true,
             isLoading: false,
@@ -129,7 +170,7 @@ export const useAuth = create<AuthState>()(
             user: user as AuthUser, 
             token,
             isAuthenticated: true,
-            error: null 
+            isLoading: false,
           });
         } catch (error) {
           // Clear invalid token on error

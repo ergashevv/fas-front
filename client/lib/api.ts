@@ -23,19 +23,27 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export const api = {
   // Auth endpoints
   auth: {
-    signup: async (userData: { name: string; email: string; password: string; phone?: string; role?: string }): Promise<{ user: User; token: string }> => {
+    signup: async (userData: { name: string; phone: string; password: string }): Promise<{ user: User; token: string }> => {
       const response = await fetch(`${API_BASE}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          ...userData,
+          // Backend expects these fields
+          email: `${userData.phone.replace(/[^0-9]/g, '')}@faskids.uz`,
+        }),
       });
       return handleResponse(response);
     },
-    login: async (email: string, password: string): Promise<{ user: User; token: string }> => {
+    login: async (phone: string, password: string): Promise<{ user: User; token: string }> => {
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          // Backend expects email for login, but we're using phone
+          email: `${phone.replace(/[^0-9]/g, '')}@faskids.uz`,
+          password 
+        }),
       });
       return handleResponse(response);
     },
