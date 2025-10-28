@@ -12,6 +12,7 @@ export default function Checkout() {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
   const [step, setStep] = useState(1);
+
   const subtotal = total();
   const shipping = calculateShipping(subtotal);
   const tax = calculateTax(subtotal);
@@ -31,7 +32,13 @@ export default function Checkout() {
     const name = localStorage.getItem("fas.region-name");
     return code && name ? { code, name } : null;
   });
-  const [delivery, setDelivery] = useState<{ method: "courier_door" | "pickup"; fee: number; etaDays: number }>({ method: "courier_door", fee: 0, etaDays: 2 });
+
+  const [delivery, setDelivery] = useState<{
+    method: "courier_door" | "pickup";
+    fee: number;
+    etaDays: number;
+  }>({ method: "courier_door", fee: 0, etaDays: 2 });
+
   const [paymentMethod, setPaymentMethod] = useState<"payme" | "click" | "cod">("cod");
 
   if (items.length === 0) {
@@ -44,7 +51,7 @@ export default function Checkout() {
   }
 
   const handlePlaceOrder = async () => {
-    if (!region) { return toast.error("Iltimos, viloyatni tanlang"); }
+    if (!region) return toast.error("Iltimos, viloyatni tanlang");
 
     const order = {
       id: `ORD-${Date.now()}`,
@@ -56,34 +63,43 @@ export default function Checkout() {
     };
 
     try {
-      // Create backend order for payment flow
-      const res = await fetch(`/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
-        number: order.id,
-        items: items,
-        totals: { itemsTotal: subtotal, deliveryFee: shipping, discount: 0, grandTotal: cartTotal },
-        region,
-        address: { city: formData.city, street: formData.street },
-        contact: { fullName: formData.fullName, phone: formData.phone },
-        delivery: { method: delivery.method, fee: shipping, etaDays: delivery.etaDays },
-        payment: { method: paymentMethod, status: 'awaiting_payment' }
-      })});
+      const res = await fetch(`/api/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          number: order.id,
+          items,
+          totals: {
+            itemsTotal: subtotal,
+            deliveryFee: shipping,
+            discount: 0,
+            grandTotal: cartTotal,
+          },
+          region,
+          address: { city: formData.city, street: formData.street },
+          contact: { fullName: formData.fullName, phone: formData.phone },
+          delivery: { method: delivery.method, fee: shipping, etaDays: delivery.etaDays },
+          payment: { method: paymentMethod, status: "awaiting_payment" },
+        }),
+      });
+
       const created = await res.json();
 
-      if (paymentMethod === 'cod') {
+      if (paymentMethod === "cod") {
         clearCart();
         navigate(`/payment/success?orderId=${created._id}`);
         return;
       }
 
-      if (paymentMethod === 'payme') {
-        const p = await fetch(`/api/payments/payme/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: created._id, amount: cartTotal })});
-        const data = await p.json();
-        window.location.href = data.redirectUrl;
-      } else if (paymentMethod === 'click') {
-        const p = await fetch(`/api/payments/click/create`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: created._id, amount: cartTotal })});
-        const data = await p.json();
-        window.location.href = data.redirectUrl;
-      }
+      const route = `/api/payments/${paymentMethod}/create`;
+      const p = await fetch(route, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: created._id, amount: cartTotal }),
+      });
+
+      const data = await p.json();
+      if (data.redirectUrl) window.location.href = data.redirectUrl;
     } catch {
       toast.error("Xatolik yuz berdi");
     }
@@ -105,9 +121,7 @@ export default function Checkout() {
           <div key={s.id} className="flex items-center flex-1">
             <motion.div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                step >= s.id
-                  ? "bg-primary text-white"
-                  : "bg-gray-200 text-gray-600"
+                step >= s.id ? "bg-primary text-white" : "bg-gray-200 text-gray-600"
               }`}
               whileHover={{ scale: 1.1 }}
             >
@@ -115,11 +129,7 @@ export default function Checkout() {
             </motion.div>
             <p className="ml-2 text-sm font-semibold">{s.label}</p>
             {i < steps.length - 1 && (
-              <div
-                className={`flex-1 h-1 mx-2 ${
-                  step > s.id ? "bg-primary" : "bg-gray-200"
-                }`}
-              />
+              <div className={`flex-1 h-1 mx-2 ${step > s.id ? "bg-primary" : "bg-gray-200"}`} />
             )}
           </div>
         ))}
@@ -138,49 +148,18 @@ export default function Checkout() {
               <div className="space-y-4">
                 <h2 className="font-bold text-lg mb-6">Yetkazish Manzili</h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    placeholder="To'liq Ismi"
-                    value={formData.fullName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fullName: e.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Telefon"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Mamlakat"
-                    value={formData.country}
-                    onChange={(e) =>
-                      setFormData({ ...formData, country: e.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Shahar"
-                    value={formData.city}
-                    onChange={(e) =>
-                      setFormData({ ...formData, city: e.target.value })
-                    }
-                  />
-                  <Input
-                    placeholder="Ko'cha"
-                    value={formData.street}
-                    onChange={(e) =>
-                      setFormData({ ...formData, street: e.target.value })
-                    }
-                    className="col-span-2"
-                  />
-                  <Input
-                    placeholder="Zip Kodi"
-                    value={formData.zip}
-                    onChange={(e) =>
-                      setFormData({ ...formData, zip: e.target.value })
-                    }
-                  />
+                  <Input placeholder="To'liq ism" value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })} />
+                  <Input placeholder="Telefon" value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                  <Input placeholder="Mamlakat" value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })} />
+                  <Input placeholder="Shahar" value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })} />
+                  <Input placeholder="Ko'cha" className="col-span-2" value={formData.street}
+                    onChange={(e) => setFormData({ ...formData, street: e.target.value })} />
+                  <Input placeholder="Zip Kodi" value={formData.zip}
+                    onChange={(e) => setFormData({ ...formData, zip: e.target.value })} />
                 </div>
               </div>
             )}
@@ -189,25 +168,32 @@ export default function Checkout() {
               <div className="space-y-4">
                 <h2 className="font-bold text-lg mb-6">To‘lov turi</h2>
                 <div className="space-y-3">
-                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "payme" ? "#7b68ee" : "#ccc" }}>
-                    <input type="radio" name="payment" value="payme" checked={paymentMethod === "payme"} onChange={() => setPaymentMethod("payme")} className="w-4 h-4" />
-                    <span className="ml-3 font-semibold">Payme</span>
-                  </label>
-                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "click" ? "#7b68ee" : "#ccc" }}>
-                    <input type="radio" name="payment" value="click" checked={paymentMethod === "click"} onChange={() => setPaymentMethod("click")} className="w-4 h-4" />
-                    <span className="ml-3 font-semibold">Click</span>
-                  </label>
-                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition" style={{ borderColor: paymentMethod === "cod" ? "#7b68ee" : "#ccc" }}>
-                    <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="w-4 h-4" />
-                    <span className="ml-3 font-semibold">Naqd (kuryerga)</span>
-                  </label>
+                  {["payme", "click", "cod"].map((m) => (
+                    <label
+                      key={m}
+                      className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
+                      style={{ borderColor: paymentMethod === m ? "#7b68ee" : "#ccc" }}
+                    >
+                      <input
+                        type="radio"
+                        name="payment"
+                        value={m}
+                        checked={paymentMethod === m}
+                        onChange={() => setPaymentMethod(m as any)}
+                        className="w-4 h-4"
+                      />
+                      <span className="ml-3 font-semibold">
+                        {m === "payme" ? "Payme" : m === "click" ? "Click" : "Naqd (kuryerga)"}
+                      </span>
+                    </label>
+                  ))}
                 </div>
+              </div>
+            )}
 
             {step === 3 && (
               <div className="space-y-4">
-                <h2 className="font-bold text-lg mb-6">
-                  Buyurtmani Tasdiqlang
-                </h2>
+                <h2 className="font-bold text-lg mb-6">Buyurtmani Tasdiqlang</h2>
                 <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                   <div className="flex justify-between">
                     <span>Manzil:</span>
@@ -218,7 +204,11 @@ export default function Checkout() {
                   <div className="flex justify-between">
                     <span>To'lov:</span>
                     <span className="font-semibold">
-                      {paymentMethod === "payme" ? "Payme" : paymentMethod === "click" ? "Click" : "Naqd"}
+                      {paymentMethod === "payme"
+                        ? "Payme"
+                        : paymentMethod === "click"
+                        ? "Click"
+                        : "Naqd"}
                     </span>
                   </div>
                 </div>
@@ -233,7 +223,7 @@ export default function Checkout() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
         >
-          <h2 className="font-bold text-lg mb-6">Xulasa</h2>
+          <h2 className="font-bold text-lg mb-6">Xulosa</h2>
           <div className="space-y-3 mb-4 text-sm max-h-48 overflow-auto">
             {items.map((item) => (
               <div key={item.productId} className="flex justify-between">

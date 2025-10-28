@@ -16,6 +16,30 @@ const DEFAULT_ADMIN = {
   role: 'admin' as const,
 };
 
+// Helpers to normalize and format phone numbers
+function digitsOnly(input: string): string {
+  return (input || '').replace(/[^0-9]/g, '');
+}
+
+function normalizePhone(input: string): { ok: boolean; e164: string | null } {
+  const digits = digitsOnly(input);
+  if (digits.length === 12 && digits.startsWith('998')) {
+    return { ok: true, e164: digits }; // 998 + 9 digits
+  }
+  if (digits.length === 9) {
+    return { ok: true, e164: `998${digits}` };
+  }
+  return { ok: false, e164: null };
+}
+
+function formatUzbekDashed(e164: string): string {
+  // Expect 12 digits starting with 998
+  const d = e164.startsWith('998') ? e164.slice(3) : e164;
+  if (d.length !== 9) return e164;
+  // XX-XXX-XX-XX
+  return `+998-${d.slice(0,2)}-${d.slice(2,5)}-${d.slice(5,7)}-${d.slice(7,9)}`;
+}
+
 interface AuthState {
   user: AuthUser | null;
   token: string | null;
@@ -46,22 +70,24 @@ export const useAuth = create<AuthState>()(
       isLoading: false,
       error: null,
 
-      // Validate phone number format: +998-XX-XXX-XX-XX
+      // Validate phone number in a flexible way; accept common inputs and check length
       validatePhone: (phone: string): boolean => {
-        const phoneRegex = /^\+998-\d{2}-\d{3}-\d{2}-\d{2}$/;
-        return phoneRegex.test(phone);
+        const { ok } = normalizePhone(phone);
+        return ok;
       },
       
       login: async (phone: string, password: string) => {
         set({ isLoading: true, error: null });
         
-        // Handle default admin login
-        if (phone === DEFAULT_ADMIN.phone && password === DEFAULT_ADMIN.password) {
+        // Handle default admin login (accept any formatting of admin phone)
+        const normalizedAdmin = normalizePhone(DEFAULT_ADMIN.phone).e164;
+        const normalizedInput = normalizePhone(phone).e164;
+        if (normalizedInput && normalizedAdmin && normalizedInput === normalizedAdmin && password === DEFAULT_ADMIN.password) {
           const adminUser = {
             id: 'admin-1',
             name: DEFAULT_ADMIN.name,
             email: 'admin@faskids.uz',
-            phone: DEFAULT_ADMIN.phone,
+            phone: formatUzbekDashed(normalizedInput),
             role: DEFAULT_ADMIN.role,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
@@ -84,6 +110,7 @@ export const useAuth = create<AuthState>()(
         }
 
         try {
+          // Pass through original; API will sanitize, but we also accept flexible inputs
           const { user, token } = await api.auth.login(phone, password);
           localStorage.setItem('auth_token', token);
           set({ 
@@ -109,27 +136,27 @@ export const useAuth = create<AuthState>()(
       signup: async (userData) => {
         set({ isLoading: true, error: null });
         
-        // Validate phone number format
-        if (!get().validatePhone(userData.phone)) {
-          const error = 'Iltimos, telefon raqamingizni +998-XX-XXX-XX-XX formatida kiriting';
+        // Validate and normalize phone number
+        const norm = normalizePhone(userData.phone);
+        if (!norm.ok || !norm.e164) {
+          const error = 'Iltimos, to‘g‘ri telefon raqamini kiriting (masalan, +998 XX XXX XX XX)';
           set({ error, isLoading: false });
           throw new Error(error);
         }
         
         try {
-          // Format phone to remove dashes for backend
-          const formattedPhone = userData.phone.replace(/-/g, '');
+          const e164 = norm.e164; // 998XXXXXXXXX
           
           const { user, token } = await api.auth.signup({
             ...userData,
-            phone: formattedPhone,
+            phone: e164, // backend will derive email; we keep digits
           });
           
           // Store token in localStorage for persistence
           localStorage.setItem('auth_token', token);
           
           set({ 
-            user: { ...user, phone: userData.phone } as AuthUser, // Keep formatted phone with dashes
+            user: { ...user, phone: formatUzbekDashed(e164) } as AuthUser,
             token,
             isAuthenticated: true,
             isLoading: false,

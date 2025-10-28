@@ -1,7 +1,6 @@
 import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { createServer } from "./fas-back/index";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -29,11 +28,17 @@ function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
     apply: "serve", // Only apply during development (serve mode)
-    configureServer(server) {
-      const app = createServer();
-
-      // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
+    async configureServer(server) {
+      try {
+        const { createServer } = await import("./fas-back/index");
+        const app = createServer();
+        // Add Express app as middleware to Vite dev server
+        server.middlewares.use(app);
+      } catch (err) {
+        server.config.logger.warn(
+          "fas-back not found; skipping backend integration in dev server."
+        );
+      }
     },
   };
 }
