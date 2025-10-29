@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DeliveryInfo } from "@shared/api";
-import { deliveryApi } from "@/lib/adminApi";
+import { adminApi } from "../../lib/adminApi";
 import { MapPin, Clock, Truck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -35,7 +35,7 @@ export const LocationPicker = ({ onLocationSelect, selectedAddress }: LocationPi
         setCoordinates({ lat: latitude, lng: longitude });
         
         try {
-          const delivery = await deliveryApi.calculate({
+          const delivery = await adminApi.delivery.calculate({
             latitude,
             longitude,
             address: selectedAddress
@@ -94,7 +94,7 @@ export const LocationPicker = ({ onLocationSelect, selectedAddress }: LocationPi
         longitude: 69.2401 + (Math.random() - 0.5) * 0.1
       };
       
-      const delivery = await deliveryApi.calculate({
+      const delivery = await adminApi.delivery.calculate({
         ...mockCoordinates,
         address: selectedAddress
       });

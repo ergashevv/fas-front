@@ -5,9 +5,10 @@ import { Container } from "@/components/core/Container";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AdminStats, Order } from "@shared/api";
+import { AdminStats, Order, AuditLog, AdvancedStats, SystemHealth, AdminUser } from "@shared/api";
 import { useAuth } from "@/store/useAuth";
-import { adminApi } from "@/lib/adminApi";
+import { adminApi } from "../lib/adminApi";
+import { AdminOnly, ModeratorOrAdmin, usePermissions } from "@/components/auth/RoleGuard";
 import { 
   Users, 
   Package, 
@@ -27,9 +28,15 @@ import { toast } from "sonner";
 
 export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuth();
+  const { can, isAdmin, isAdminOrModerator } = usePermissions();
   const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [advancedStats, setAdvancedStats] = useState<AdvancedStats | null>(null);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "users" | "logs" | "system">("dashboard");
 
   useEffect(() => {
     if (!isAuthenticated || !user || (user.role !== 'admin' && user.role !== 'moderator')) {
@@ -37,21 +44,47 @@ export default function AdminDashboard() {
       return;
     }
 
-    const loadStats = async () => {
+    const loadAllData = async () => {
       try {
         setLoading(true);
+        
+        // Basic dashboard stats
         const dashboardStats = await adminApi.getStats();
         setStats(dashboardStats);
+
+        // Advanced stats (if admin)
+        if (isAdmin()) {
+          const [advanced, health, logs, usersList] = await Promise.all([
+            adminApi.system.getAdvancedStats('30d'),
+            adminApi.system.getHealth(),
+            adminApi.auditLogs.getAll({ limit: 20 }),
+            adminApi.users.getAll({ limit: 10 })
+          ]);
+          
+          setAdvancedStats(advanced);
+          setSystemHealth(health);
+          setAuditLogs(logs.data);
+          setUsers(usersList.users);
+        } else if (isAdminOrModerator()) {
+          // Moderator can see limited data
+          const [usersList, logs] = await Promise.all([
+            adminApi.users.getAll({ limit: 10 }),
+            adminApi.auditLogs.getAll({ limit: 10 })
+          ]);
+          setUsers(usersList.users);
+          setAuditLogs(logs.data);
+        }
+        
       } catch (error) {
-        console.error("Error loading admin stats:", error);
-        toast.error("Admin statistikalarni yuklashda xatolik");
+        console.error("Error loading admin data:", error);
+        toast.error("Admin ma'lumotlarni yuklashda xatolik");
       } finally {
         setLoading(false);
       }
     };
 
-    loadStats();
-  }, [isAuthenticated, user, navigate]);
+    loadAllData();
+  }, [isAuthenticated, user, navigate, isAdmin, isAdminOrModerator]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,6 +109,50 @@ export default function AdminDashboard() {
       case 'delivered': return 'Yetkazilgan';
       case 'cancelled': return 'Bekor qilingan';
       default: return status;
+    }
+  };
+
+  const handleToggleUserStatus = async (userId: string) => {
+    try {
+      await adminApi.users.toggleStatus(userId);
+      toast.success("Foydalanuvchi holati o'zgartirildi");
+      // Refresh users list
+      const usersList = await adminApi.users.getAll({ limit: 10 });
+      setUsers(usersList.users);
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      toast.error("Foydalanuvchi holatini o'zgartirishda xatolik");
+    }
+  };
+
+  const handleChangeUserRole = async (userId: string, newRole: "admin" | "moderator" | "user") => {
+    try {
+      await adminApi.users.changeRole(userId, newRole);
+      toast.success("Foydalanuvchi roli o'zgartirildi");
+      // Refresh users list
+      const usersList = await adminApi.users.getAll({ limit: 10 });
+      setUsers(usersList.users);
+    } catch (error) {
+      console.error("Error changing user role:", error);
+      toast.error("Foydalanuvchi rolini o'zgartirishda xatolik");
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'admin': return 'bg-red-100 text-red-800';
+      case 'moderator': return 'bg-blue-100 text-blue-800';
+      case 'user': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getRoleText = (role: string) => {
+    switch (role) {
+      case 'admin': return 'Admin';
+      case 'moderator': return 'Moderator';
+      case 'user': return 'Foydalanuvchi';
+      default: return role;
     }
   };
 
@@ -107,24 +184,83 @@ export default function AdminDashboard() {
             </div>
             
             <div className="flex gap-3">
-              <Button
-                onClick={() => navigate("/admin/products")}
-                className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Mahsulot qo'shish
-              </Button>
-              <Button
-                onClick={() => navigate("/admin/users")}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Users className="w-4 h-4" />
-                Foydalanuvchilar
-              </Button>
+              <ModeratorOrAdmin>
+                <Button
+                  onClick={() => navigate("/admin/products")}
+                  className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Mahsulot qo'shish
+                </Button>
+              </ModeratorOrAdmin>
+              
+              <AdminOnly>
+                <Button
+                  onClick={() => navigate("/admin/users")}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Foydalanuvchilar
+                </Button>
+              </AdminOnly>
             </div>
           </div>
 
+          {/* Tab Navigation */}
+          <div className="flex space-x-1 bg-white p-1 rounded-lg shadow-sm border">
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === "dashboard"
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
+            >
+              Dashboard
+            </button>
+            
+            <ModeratorOrAdmin>
+              <button
+                onClick={() => setActiveTab("users")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "users"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Foydalanuvchilar
+              </button>
+            </ModeratorOrAdmin>
+
+            <AdminOnly>
+              <button
+                onClick={() => setActiveTab("logs")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "logs"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Audit Logs
+              </button>
+              
+              <button
+                onClick={() => setActiveTab("system")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "system"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Tizim
+              </button>
+            </AdminOnly>
+          </div>
+
+          {/* Content based on active tab */}
+          {activeTab === "dashboard" && (
+            <>
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
@@ -321,6 +457,169 @@ export default function AdminDashboard() {
               </Card>
             </div>
           </div>
+          </>
+          )}
+
+          {/* Users Tab */}
+          {activeTab === "users" && (
+            <ModeratorOrAdmin>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    Foydalanuvchilar boshqaruvi
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {users.map((user) => (
+                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div>
+                            <h3 className="font-semibold">{user.name}</h3>
+                            <p className="text-sm text-gray-600">{user.phone}</p>
+                          </div>
+                          <Badge className={getRoleColor(user.role)}>
+                            {getRoleText(user.role)}
+                          </Badge>
+                          <Badge variant={user.isActive ? "default" : "secondary"}>
+                            {user.isActive ? "Faol" : "Nofaol"}
+                          </Badge>
+                        </div>
+                        
+                        <AdminOnly>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleToggleUserStatus(user.id)}
+                            >
+                              {user.isActive ? "O'chirish" : "Faollashtirish"}
+                            </Button>
+                            
+                            <select
+                              value={user.role}
+                              onChange={(e) => handleChangeUserRole(user.id, e.target.value as any)}
+                              className="px-2 py-1 border rounded text-sm"
+                            >
+                              <option value="user">Foydalanuvchi</option>
+                              <option value="moderator">Moderator</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </div>
+                        </AdminOnly>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </ModeratorOrAdmin>
+          )}
+
+          {/* Audit Logs Tab */}
+          {activeTab === "logs" && (
+            <AdminOnly>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Settings className="w-5 h-5" />
+                    Audit Logs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {auditLogs.map((log) => (
+                      <div key={log.id} className="p-3 border rounded-lg bg-gray-50">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">
+                              {log.userName} ({log.userRole})
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {log.action} on {log.resource}
+                              {log.resourceId && ` (ID: ${log.resourceId})`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(log.timestamp).toLocaleString()}
+                            </p>
+                          </div>
+                          <Badge variant={log.success ? "default" : "destructive"}>
+                            {log.success ? "Success" : "Failed"}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </AdminOnly>
+          )}
+
+          {/* System Tab */}
+          {activeTab === "system" && (
+            <AdminOnly>
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="w-5 h-5" />
+                      Tizim holati
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {systemHealth && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-green-600">
+                              {systemHealth.database.collections.users}
+                            </p>
+                            <p className="text-sm text-gray-600">Foydalanuvchilar</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-blue-600">
+                              {systemHealth.database.collections.products}
+                            </p>
+                            <p className="text-sm text-gray-600">Mahsulotlar</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-orange-600">
+                              {systemHealth.database.collections.orders}
+                            </p>
+                            <p className="text-sm text-gray-600">Buyurtmalar</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-purple-600">
+                              {systemHealth.database.collections.comments}
+                            </p>
+                            <p className="text-sm text-gray-600">Izohlar</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-2xl font-bold text-gray-600">
+                              {systemHealth.activity.last24Hours}
+                            </p>
+                            <p className="text-sm text-gray-600">24 soat faollik</p>
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t">
+                          <p className="text-sm text-gray-600">
+                            Uptime: {Math.floor(systemHealth.uptime / 3600)} soat
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Memory: {Math.round(systemHealth.memory.heapUsed / 1024 / 1024)} MB
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Status: <span className="text-green-600 font-semibold">{systemHealth.status}</span>
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </AdminOnly>
+          )}
         </motion.div>
       </Container>
     </div>

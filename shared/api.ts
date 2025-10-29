@@ -174,3 +174,107 @@ export interface OrderTracking {
     phone: string;
   };
 }
+
+// Audit Log Types
+export interface AuditLog {
+  id: string;
+  userId: string;
+  userName: string;
+  userRole: "admin" | "moderator" | "user";
+  action: string;
+  resource: string;
+  resourceId?: string;
+  details: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: string;
+  success: boolean;
+  errorMessage?: string;
+}
+
+// Advanced Admin Stats
+export interface AdvancedStats {
+  period: string;
+  userStats: Array<{
+    _id: string;
+    newUsers: number;
+    activeUsers: number;
+  }>;
+  orderStats: Array<{
+    _id: {
+      date: string;
+      status: string;
+    };
+    count: number;
+    totalAmount: number;
+  }>;
+  revenueStats: Array<{
+    _id: string;
+    revenue: number;
+    orderCount: number;
+    avgOrderValue: number;
+  }>;
+  topProducts: Array<{
+    _id: string;
+    title: string;
+    price: number;
+    salesCount: number;
+    revenue: number;
+  }>;
+  topCustomers: Array<{
+    _id: string;
+    name: string;
+    phone: string;
+    orderCount: number;
+    totalSpent: number;
+    avgOrderValue: number;
+  }>;
+  activityStats: Array<{
+    _id: {
+      action: string;
+      resource: string;
+      userRole: string;
+    };
+    count: number;
+  }>;
+  recentActivity: AuditLog[];
+}
+
+// System Health
+export interface SystemHealth {
+  status: string;
+  timestamp: string;
+  database: {
+    connected: boolean;
+    collections: {
+      users: number;
+      products: number;
+      orders: number;
+      comments: number;
+      auditLogs: number;
+    };
+  };
+  activity: {
+    last24Hours: number;
+  };
+  memory: {
+    rss: number;
+    heapTotal: number;
+    heapUsed: number;
+    external: number;
+    arrayBuffers: number;
+  };
+  uptime: number;
+}
+
+// Permission Types
+export interface Permission {
+  resource: string;
+  actions: string[];
+}
+
+export interface RolePermissions {
+  admin: Record<string, string[]>;
+  moderator: Record<string, string[]>;
+  user: Record<string, string[]>;
+}
