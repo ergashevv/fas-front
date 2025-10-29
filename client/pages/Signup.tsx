@@ -13,16 +13,15 @@ import { useToast } from "@/hooks/use-toast";
 export default function Signup() {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
-    phone: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { signup, isLoading, error, clearError } = useAuth();
+  const { signup, isLoading, error, clearError, validatePhone } = useAuth();
   const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +37,19 @@ export default function Signup() {
     
     console.log("📝 Form submitted with data:", { ...formData, password: "***", confirmPassword: "***" });
     
-    // Validate passwords match
+    // Basic client-side validation
+    if ((formData.name || '').trim().length < 2) {
+      toast({ title: t("error"), description: "Ism kamida 2 ta belgidan iborat bo'lsin", variant: "destructive" });
+      return;
+    }
+    if (!validatePhone(formData.phone)) {
+      toast({ title: t("error"), description: "Telefon raqami noto'g'ri. +998 XX XXX XX XX shaklida kiriting.", variant: "destructive" });
+      return;
+    }
+    if ((formData.password || '').length < 6) {
+      toast({ title: t("error"), description: "Parol kamida 6 ta belgidan iborat bo'lishi kerak", variant: "destructive" });
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       console.log("❌ Passwords don't match");
       toast({
@@ -183,21 +194,7 @@ export default function Signup() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                  {t("signup.email")}
-                </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t("signup.emailPlaceholder")}
-                  className="pl-4 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 hover:border-blue-300"
-                  required
-                />
-              </div>
+
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-sm font-medium text-gray-700">

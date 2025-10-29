@@ -65,6 +65,17 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   return <>{children}</>;
 };
 
+// Global auth bootstrapper to load user from /me when token exists
+const AuthInit = () => {
+  const { token, user, fetchUser, isLoading } = useAuth();
+  useEffect(() => {
+    if (token && !user && !isLoading) {
+      fetchUser();
+    }
+  }, [token, user, isLoading, fetchUser]);
+  return null;
+};
+
 // Guest Route Component - Only for non-authenticated users
 const GuestRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -92,6 +103,7 @@ const App = () => (
     <BrowserRouter>
       <TooltipProvider>
         <div className="flex flex-col min-h-screen">
+          <AuthInit />
           <Header />
           <main className="flex-grow">
             <ScrollToTop />

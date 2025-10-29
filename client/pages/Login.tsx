@@ -17,7 +17,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, isLoading, error, clearError, validatePhone } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,6 +25,23 @@ export default function Login() {
     clearError();
     
     try {
+      // Basic client-side validation
+      if (!validatePhone(phone)) {
+        toast({
+          title: t("error"),
+          description: "Telefon raqami noto'g'ri. +998 XX XXX XX XX shaklida kiriting.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if ((password || '').length < 6) {
+        toast({
+          title: t("error"),
+          description: "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
+          variant: "destructive",
+        });
+        return;
+      }
       await login(phone, password);
       toast({
         title: t("success"),

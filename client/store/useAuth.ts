@@ -240,9 +240,7 @@ export const useAuth = create<AuthState>()(
       name: "auth-storage",
       // Only persist these fields to prevent hydration issues
       partialize: (state) => ({
-        user: state.user,
         token: state.token,
-        isAuthenticated: state.isAuthenticated,
       }),
     }
   )

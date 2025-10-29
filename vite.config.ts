@@ -7,6 +7,20 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+      },
+      "/api-docs": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+      },
+      "/api-docs.json": {
+        target: "http://localhost:8081",
+        changeOrigin: true,
+      },
+    },
     fs: {
       allow: ["./", "./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
@@ -15,7 +29,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/spa",
   },
-  plugins: [react(), expressPlugin()],
+  plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client"),
@@ -23,22 +37,4 @@ export default defineConfig(({ mode }) => ({
     },
   },
 }));
-
-function expressPlugin(): Plugin {
-  return {
-    name: "express-plugin",
-    apply: "serve", // Only apply during development (serve mode)
-    async configureServer(server) {
-      try {
-        const { createServer } = await import("./fas-back/index");
-        const app = createServer();
-        // Add Express app as middleware to Vite dev server
-        server.middlewares.use(app);
-      } catch (err) {
-        server.config.logger.warn(
-          "fas-back not found; skipping backend integration in dev server."
-        );
-      }
-    },
-  };
-}
+ 

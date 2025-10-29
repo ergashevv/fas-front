@@ -2,8 +2,8 @@ import { Product, Category, Comment, Order, User } from "@shared/api";
 
 export type { User }; // Re-export the User type
 
-// Use VITE_API_BASE from .env or default to localhost:8080 for development
-const API_BASE = import.meta.env.VITE_API_BASE || (import.meta.env.DEV ? "http://localhost:8080" : "https://faskids.shop");
+// Use VITE_API_BASE from .env or same-origin in development (so Vite proxy works)
+const API_BASE = import.meta.env.VITE_API_BASE ?? (import.meta.env.DEV ? "" : "https://faskids.shop");
 
 // Helper function to get auth headers
 function getAuthHeader() {
@@ -27,11 +27,7 @@ export const api = {
       const response = await fetch(`${API_BASE}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...userData,
-          // Backend expects these fields
-          email: `${userData.phone.replace(/[^0-9]/g, '')}@faskids.uz`,
-        }),
+        body: JSON.stringify(userData),
       });
       return handleResponse(response);
     },
@@ -39,11 +35,7 @@ export const api = {
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          // Backend expects email for login, but we're using phone
-          email: `${phone.replace(/[^0-9]/g, '')}@faskids.uz`,
-          password 
-        }),
+        body: JSON.stringify({ phone, password }),
       });
       return handleResponse(response);
     },

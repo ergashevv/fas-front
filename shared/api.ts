@@ -67,7 +67,6 @@ export interface Order {
 export interface User {
   id: string;
   name: string;
-  email?: string;
   phone: string;
   addresses: Address[];
   wishlist: string[];
@@ -83,7 +82,6 @@ export interface SignupRequest {
   name: string;
   phone: string;
   password: string;
-  email?: string;
 }
 
 export interface AuthResponse {
