@@ -57,7 +57,7 @@ export default function OrderDetail() {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Sana</p>
-                <p className="font-semibold">{formatDate(order.date)}</p>
+                <p className="font-semibold">{formatDate(order.createdAt)}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Status</p>

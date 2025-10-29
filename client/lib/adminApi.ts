@@ -83,6 +83,153 @@ export const adminApi = {
     }
   },
 
+  // Product Management
+  products: {
+    getAll: async (params?: { page?: number; limit?: number; category?: string; search?: string; gender?: string; available?: boolean }): Promise<{
+      products: Product[];
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }> => {
+      const queryString = new URLSearchParams(params as any).toString();
+      const response = await fetch(`${API_BASE}/api/admin/products${queryString ? `?${queryString}` : ""}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch products");
+      return await response.json();
+    },
+
+    create: async (productData: Omit<Product, "id">): Promise<{ message: string; product: Product }> => {
+      const response = await fetch(`${API_BASE}/api/admin/products`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(productData)
+      });
+      if (!response.ok) throw new Error("Failed to create product");
+      return await response.json();
+    },
+
+    update: async (productId: string, productData: Partial<Product>): Promise<{ message: string; product: Product }> => {
+      const response = await fetch(`${API_BASE}/api/admin/products/${productId}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(productData)
+      });
+      if (!response.ok) throw new Error("Failed to update product");
+      return await response.json();
+    },
+
+    delete: async (productId: string): Promise<{ message: string }> => {
+      const response = await fetch(`${API_BASE}/api/admin/products/${productId}`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to delete product");
+      return await response.json();
+    }
+  },
+
+  // Category Management
+  categories: {
+    getAll: async (): Promise<Category[]> => {
+      const response = await fetch(`${API_BASE}/api/admin/categories`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch categories");
+      return await response.json();
+    },
+
+    create: async (categoryData: Omit<Category, "id">): Promise<{ message: string; category: Category }> => {
+      const response = await fetch(`${API_BASE}/api/admin/categories`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(categoryData)
+      });
+      if (!response.ok) throw new Error("Failed to create category");
+      return await response.json();
+    },
+
+    update: async (categoryId: string, categoryData: Partial<Category>): Promise<{ message: string; category: Category }> => {
+      const response = await fetch(`${API_BASE}/api/admin/categories/${categoryId}`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(categoryData)
+      });
+      if (!response.ok) throw new Error("Failed to update category");
+      return await response.json();
+    },
+
+    delete: async (categoryId: string): Promise<{ message: string }> => {
+      const response = await fetch(`${API_BASE}/api/admin/categories/${categoryId}`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to delete category");
+      return await response.json();
+    }
+  },
+
+  // Order Management
+  orders: {
+    getAll: async (params?: { page?: number; limit?: number; status?: string; userId?: string }): Promise<{
+      orders: Order[];
+      pagination: { page: number; limit: number; total: number; pages: number };
+    }> => {
+      const queryString = new URLSearchParams(params as any).toString();
+      const response = await fetch(`${API_BASE}/api/admin/orders${queryString ? `?${queryString}` : ""}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch orders");
+      return await response.json();
+    },
+
+    updateStatus: async (orderId: string, status: string): Promise<{ message: string; order: Order }> => {
+      const response = await fetch(`${API_BASE}/api/admin/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) throw new Error("Failed to update order status");
+      return await response.json();
+    },
+
+    assignCourier: async (orderId: string, courierInfo: { name: string; phone: string }): Promise<{ message: string; order: Order }> => {
+      const response = await fetch(`${API_BASE}/api/admin/orders/${orderId}/assign-courier`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(courierInfo)
+      });
+      if (!response.ok) throw new Error("Failed to assign courier");
+      return await response.json();
+    }
+  },
+
   // Audit Logs
   auditLogs: {
     getAll: async (params?: {

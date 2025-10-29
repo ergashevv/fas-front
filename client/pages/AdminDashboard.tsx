@@ -9,6 +9,10 @@ import { AdminStats, Order, AuditLog, AdvancedStats, SystemHealth, AdminUser } f
 import { useAuth } from "@/store/useAuth";
 import { adminApi } from "../lib/adminApi";
 import { AdminOnly, ModeratorOrAdmin, usePermissions } from "@/components/auth/RoleGuard";
+import AdminProducts from "./AdminProducts";
+import AdminOrders from "./AdminOrders";
+import AdminUsers from "./AdminUsers";
+import AdminCategories from "./AdminCategories";
 import { 
   Users, 
   Package, 
@@ -36,7 +40,7 @@ export default function AdminDashboard() {
   const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "users" | "logs" | "system">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "products" | "orders" | "categories" | "users" | "logs" | "system">("dashboard");
 
   useEffect(() => {
     if (!isAuthenticated || !user || (user.role !== 'admin' && user.role !== 'moderator')) {
@@ -219,6 +223,45 @@ export default function AdminDashboard() {
             >
               Dashboard
             </button>
+
+            <ModeratorOrAdmin>
+              <button
+                onClick={() => setActiveTab("products")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "products"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Mahsulotlar
+              </button>
+            </ModeratorOrAdmin>
+
+            <ModeratorOrAdmin>
+              <button
+                onClick={() => setActiveTab("orders")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "orders"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Buyurtmalar
+              </button>
+            </ModeratorOrAdmin>
+
+            <ModeratorOrAdmin>
+              <button
+                onClick={() => setActiveTab("categories")}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === "categories"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                Kategoriyalar
+              </button>
+            </ModeratorOrAdmin>
             
             <ModeratorOrAdmin>
               <button
@@ -460,61 +503,7 @@ export default function AdminDashboard() {
           </>
           )}
 
-          {/* Users Tab */}
-          {activeTab === "users" && (
-            <ModeratorOrAdmin>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="w-5 h-5" />
-                    Foydalanuvchilar boshqaruvi
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {users.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <h3 className="font-semibold">{user.name}</h3>
-                            <p className="text-sm text-gray-600">{user.phone}</p>
-                          </div>
-                          <Badge className={getRoleColor(user.role)}>
-                            {getRoleText(user.role)}
-                          </Badge>
-                          <Badge variant={user.isActive ? "default" : "secondary"}>
-                            {user.isActive ? "Faol" : "Nofaol"}
-                          </Badge>
-                        </div>
-                        
-                        <AdminOnly>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleToggleUserStatus(user.id)}
-                            >
-                              {user.isActive ? "O'chirish" : "Faollashtirish"}
-                            </Button>
-                            
-                            <select
-                              value={user.role}
-                              onChange={(e) => handleChangeUserRole(user.id, e.target.value as any)}
-                              className="px-2 py-1 border rounded text-sm"
-                            >
-                              <option value="user">Foydalanuvchi</option>
-                              <option value="moderator">Moderator</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </div>
-                        </AdminOnly>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </ModeratorOrAdmin>
-          )}
+
 
           {/* Audit Logs Tab */}
           {activeTab === "logs" && (
@@ -619,6 +608,34 @@ export default function AdminDashboard() {
                 </Card>
               </div>
             </AdminOnly>
+          )}
+
+          {/* Products Tab */}
+          {activeTab === "products" && (
+            <ModeratorOrAdmin>
+              <AdminProducts />
+            </ModeratorOrAdmin>
+          )}
+
+          {/* Orders Tab */}
+          {activeTab === "orders" && (
+            <ModeratorOrAdmin>
+              <AdminOrders />
+            </ModeratorOrAdmin>
+          )}
+
+          {/* Categories Tab */}
+          {activeTab === "categories" && (
+            <ModeratorOrAdmin>
+              <AdminCategories />
+            </ModeratorOrAdmin>
+          )}
+
+          {/* Users Management Tab */}
+          {activeTab === "users" && (
+            <ModeratorOrAdmin>
+              <AdminUsers />
+            </ModeratorOrAdmin>
           )}
         </motion.div>
       </Container>
