@@ -5,6 +5,7 @@ import { Container } from "@/components/core/Container";
 import { Price } from "@/components/common/Price";
 import { RatingStars } from "@/components/common/RatingStars";
 import { useCart } from "@/store/useCart";
+import { useAuth } from "@/store/useAuth";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
@@ -38,6 +39,7 @@ export default function ProductDetail() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const { addItem } = useCart();
+  const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -127,40 +129,58 @@ export default function ProductDetail() {
     });
   };
 
-  const handleAddComment = (commentData: {
+  const handleAddComment = async (commentData: {
     rating: number;
     title: string;
     content: string;
     size?: string;
     color?: string;
   }) => {
-    const newComment: Comment = {
-      id: `c${Date.now()}`,
-      productId: product!.id,
-      userId: "current-user",
-      userName: "Siz",
-      rating: commentData.rating,
-      title: commentData.title,
-      content: commentData.content,
-      date: new Date().toISOString(),
-      verified: false,
-      helpful: 0,
-      size: commentData.size,
-      color: commentData.color,
-    };
-    
-    setComments(prev => [newComment, ...prev]);
-    toast.success("Sharhingiz qo'shildi!");
+    if (!isAuthenticated || !user) {
+      toast.error("Sharh yozish uchun tizimga kiring");
+      navigate("/login");
+      return;
+    }
+
+    if (!product) {
+      toast.error("Mahsulot topilmadi");
+      return;
+    }
+
+    try {
+      const newComment = await api.comments.create(product.id, {
+        userId: user.id,
+        userName: user.name,
+        rating: commentData.rating,
+        title: commentData.title,
+        content: commentData.content,
+        size: commentData.size,
+        color: commentData.color,
+      });
+      
+      setComments(prev => [newComment, ...prev]);
+      toast.success("Sharhingiz qo'shildi!");
+    } catch (error) {
+      console.error("Sharh qo'shishda xatolik:", error);
+      toast.error("Sharh qo'shishda xatolik yuz berdi");
+    }
   };
 
-  const handleHelpful = (commentId: string) => {
-    setComments(prev => 
-      prev.map(comment => 
-        comment.id === commentId 
-          ? { ...comment, helpful: comment.helpful + 1 }
-          : comment
-      )
-    );
+  const handleHelpful = async (commentId: string) => {
+    try {
+      await api.comments.markHelpful(commentId);
+      setComments(prev => 
+        prev.map(comment => 
+          comment.id === commentId 
+            ? { ...comment, helpful: comment.helpful + 1 }
+            : comment
+        )
+      );
+      toast.success("Foydali deb belgiladingiz");
+    } catch (error) {
+      console.error("Foydali belgilashda xatolik:", error);
+      toast.error("Xatolik yuz berdi");
+    }
   };
 
   const handleReport = (commentId: string) => {

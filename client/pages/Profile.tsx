@@ -98,7 +98,7 @@ export default function Profile() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
               className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
-              onClick={() => navigate("/products")}
+              onClick={() => navigate("/my-comments")}
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">

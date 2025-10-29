@@ -155,6 +155,11 @@ export const api = {
         method: "POST"
       });
       if (!response.ok) throw new Error("Failed to mark comment as helpful");
+    },
+    getByUser: async (userId: string): Promise<Comment[]> => {
+      const response = await fetch(`${API_BASE}/api/users/${userId}/comments`);
+      if (!response.ok) throw new Error("Failed to fetch user comments");
+      return await response.json();
     }
   }
 };

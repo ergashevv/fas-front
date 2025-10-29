@@ -94,7 +94,7 @@ export interface AuthResponse {
 
 export interface Comment {
   id: string;
-  productId: string;
+  productId: string | { slug: string; title: string; images: string[]; price: number };
   userId: string;
   userName: string;
   userAvatar?: string;
