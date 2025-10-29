@@ -110,8 +110,10 @@ export const useAuth = create<AuthState>()(
         }
 
         try {
-          // Pass through original; API will sanitize, but we also accept flexible inputs
-          const { user, token } = await api.auth.login(phone, password);
+          // Normalize to e164 (998XXXXXXXXX) and send with leading + for consistency
+          const norm = normalizePhone(phone);
+          const phoneForApi = norm.ok && norm.e164 ? `+${norm.e164}` : phone;
+          const { user, token } = await api.auth.login(phoneForApi, password);
           localStorage.setItem('auth_token', token);
           set({ 
             user: user as AuthUser,

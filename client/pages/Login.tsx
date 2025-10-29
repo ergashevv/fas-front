@@ -11,7 +11,7 @@ import { useAuth } from "@/store/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+998-");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -19,6 +19,15 @@ export default function Login() {
   const { t } = useTranslation();
   const { login, isLoading, error, clearError, validatePhone } = useAuth();
   const { toast } = useToast();
+
+  const formatPhone = (raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, "");
+    let rest = digits.startsWith("998") ? digits.slice(3) : digits;
+    rest = rest.slice(0, 9);
+    const parts = [rest.slice(0, 2), rest.slice(2, 5), rest.slice(5, 7), rest.slice(7, 9)];
+    const joined = parts.filter(Boolean).join("-");
+    return `+998-${joined}`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,8 +163,9 @@ export default function Login() {
                   <Input
                     id="phone"
                     type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                inputMode="numeric"
                     placeholder="+998 90 123 45 67"
                     className="pl-4 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300 hover:border-purple-300"
                     required

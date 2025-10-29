@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Signup() {
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    phone: "+998-",
     password: "",
     confirmPassword: "",
   });
@@ -24,11 +24,25 @@ export default function Signup() {
   const { signup, isLoading, error, clearError, validatePhone } = useAuth();
   const { toast } = useToast();
 
+  const formatPhone = (raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, "");
+    // Ensure country code 998
+    let rest = digits.startsWith("998") ? digits.slice(3) : digits;
+    // Limit to 9 national digits
+    rest = rest.slice(0, 9);
+    const parts = [rest.slice(0, 2), rest.slice(2, 5), rest.slice(5, 7), rest.slice(7, 9)];
+    const joined = parts.filter(Boolean).join("-");
+    return `+998-${joined}`;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    if (name === "phone") {
+      const formatted = formatPhone(value);
+      setFormData({ ...formData, phone: formatted });
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -204,9 +218,10 @@ export default function Signup() {
                   id="phone"
                   name="phone"
                   type="tel"
-                  value={formData.phone}
+                value={formData.phone}
                   onChange={handleChange}
-                  placeholder={t("signup.phonePlaceholder")}
+                inputMode="numeric"
+                placeholder={t("signup.phonePlaceholder")}
                   className="pl-4 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300 hover:border-blue-300"
                   required
                 />
