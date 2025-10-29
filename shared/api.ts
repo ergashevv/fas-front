@@ -52,7 +52,7 @@ export interface Address {
 
 export interface Order {
   id: string;
-  date: string;
+  userId: string;
   items: CartItem[];
   totals: {
     subtotal: number;
@@ -60,14 +60,21 @@ export interface Order {
     tax: number;
     total: number;
   };
-  status: "pending" | "processing" | "in_transit" | "delivered" | "cancelled";
+  status: "pending" | "confirmed" | "preparing" | "ready_for_delivery" | "in_transit" | "delivered" | "cancelled";
   address: Address;
+  delivery: DeliveryInfo;
+  paymentStatus: "pending" | "paid" | "failed";
+  paymentMethod?: "cash" | "card" | "payme" | "click";
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface User {
   id: string;
   name: string;
   phone: string;
+  role: "admin" | "moderator" | "user";
   addresses: Address[];
   wishlist: string[];
   recentlyViewed: string[];
@@ -107,4 +114,63 @@ export interface Comment {
   images?: string[];
   size?: string;
   color?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface DeliveryInfo {
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+  address: Address;
+  estimatedTime?: number;
+  courierId?: string;
+  courierName?: string;
+  courierPhone?: string;
+  instructions?: string;
+  distance?: number;
+  deliveryCost?: number;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  phone: string;
+  role: "admin" | "moderator" | "user";
+  isActive: boolean;
+  lastLogin?: string;
+  createdBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminStats {
+  totalUsers: number;
+  totalProducts: number;
+  totalOrders: number;
+  totalComments: number;
+  totalRevenue: number;
+  recentOrders: Order[];
+  ordersByStatus: Record<string, number>;
+}
+
+export interface OrderTracking {
+  order: {
+    id: string;
+    status: string;
+    total: number;
+    estimatedTime?: number;
+  };
+  timeline: Array<{
+    status: string;
+    title: string;
+    description: string;
+    timestamp?: string;
+    completed: boolean;
+  }>;
+  courier?: {
+    name: string;
+    phone: string;
+  };
 }

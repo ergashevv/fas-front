@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { api, User } from "@/lib/api";
 
-type UserRole = 'admin' | 'cashier' | 'user';
+type UserRole = 'admin' | 'moderator' | 'user';
 
 interface AuthUser extends User {
   role: UserRole;
