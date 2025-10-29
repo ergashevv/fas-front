@@ -2,8 +2,8 @@ import { Product, Category, Comment, Order, User } from "@shared/api";
 
 export type { User }; // Re-export the User type
 
-// Use VITE_API_BASE from .env or same-origin in development (so Vite proxy works)
-const API_BASE = import.meta.env.VITE_API_BASE ?? (import.meta.env.DEV ? "" : "https://faskids.shop");
+// Always use same-origin base so CORS never triggers; Vercel/NGINX rewrites handle /api → backend
+const API_BASE = "";
 
 // Helper function to get auth headers
 function getAuthHeader() {
